@@ -15,9 +15,9 @@ const Footer = () => {
       title: "Administrative",
       links: [
         { name: "Admin Portal", href: "/admin/dashboard" },
-        { name: "Privacy Policy", href: "#" },
-        { name: "Terms of Service", href: "#" },
-        { name: "Patient Care", href: "#" },
+        { name: "Privacy Policy", href: "/privacy" },
+        { name: "Terms of Service", href: "/terms" },
+        { name: "Patient Care", href: "/patient-care" },
       ],
     },
   ];
