@@ -75,7 +75,7 @@ export default function ContactPage() {
          </section>
 
          {/* Map & Social Section */}
-         <section className="py-16 bg-surface-container-low rounded-[1rem] mx-4 md:mx-8">
+         <section className="py-12 bg-surface-container-low rounded-[1rem] mx-4 md:mx-8">
             <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row gap-20 items-center">
                <div className="flex-1 space-y-8">
                   <div className="space-y-4">
@@ -96,15 +96,20 @@ export default function ContactPage() {
                   </div>
                </div>
                <div className="flex-1 w-full relative">
-                  <div className="aspect-square bg-slate-200 rounded-[1rem] overflow-hidden shadow-2xl relative z-10 border-8 border-white group">
+                  <div className="h-[500px] bg-slate-300 rounded-[1rem] overflow-hidden shadow-2xl relative z-10 border-4 border-white group">
                      <iframe
                         src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d56049.393750083815!2d77.0674824!3d28.597163449999996!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2sin!4v1774947666982!5m2!1sen!2sin"
-                        className="w-full h-full border-0 grayscale hover:grayscale-0 transition-all duration-700"
+                        className="w-full h-full border-0 transition-all duration-700"
                         allowFullScreen
                         loading="lazy"
                         referrerPolicy="no-referrer-when-downgrade"
                      />
                      <div className="absolute inset-0 bg-primary/5 pointer-events-none transition-opacity group-hover:opacity-0"></div>
+                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                        <div className="w-12 h-12 rounded-full bg-red-500 backdrop-blur-sm text-white flex items-center justify-center shadow-2xl animate-bounce-slow">
+                           <span className="material-symbols-outlined text-4xl">location_on</span>
+                        </div>
+                     </div>
                   </div>
                   <div className="absolute -top-10 -right-10 w-64 h-64 bg-secondary/10 rounded-full blur-3xl opacity-60"></div>
                </div>
@@ -117,7 +122,7 @@ export default function ContactPage() {
             <div className="max-w-7xl mx-auto px-4 text-center relative z-10 space-y-12">
                <div className="space-y-4">
                   <span className="text-secondary font-black text-xs tracking-[0.3em] uppercase">Stay Connected</span>
-                  <h4 className="text-3xl md:text-5xl font-manrope font-black text-primary tracking-tight uppercase">Follow the <span className="text-secondary italic">Sanctuary</span></h4>
+                  <h4 className="text-3xl md:text-5xl font-black text-primary uppercase">Follow the <span className="text-secondary italic">Sanctuary</span></h4>
                   <p className="text-on-surface-variant text-sm font-medium max-w-xl mx-auto opacity-70">Join our growing digital community for the latest in surgical innovations, patient success stories, and wellness insights.</p>
                </div>
                <div className="flex flex-wrap justify-center gap-6 md:gap-10">
