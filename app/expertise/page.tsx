@@ -54,7 +54,7 @@ export default function ExpertisePage() {
               </p>
               <div className="flex gap-10 items-center pt-6">
                 <div>
-                  <div className="text-xs font-black text-secondary-fixed uppercase mb-2 tracking-widest">Languages Spoken</div>
+                  <div className="text-sm font-black text-secondary-fixed uppercase mb-2">Languages Spoken</div>
                   <div className="flex gap-2">
                     <span className="px-3 py-1 bg-white/10 backdrop-blur-sm border border-white/10 rounded-lg text-sm font-bold text-white/80">English</span>
                     <span className="px-3 py-1 bg-white/10 backdrop-blur-sm border border-white/10 rounded-lg text-sm font-bold text-white/80">Hindi</span>
@@ -66,7 +66,7 @@ export default function ExpertisePage() {
               <div className="aspect-[4/5] bg-white/10 rounded-[2rem] overflow-hidden translate-y-6 shadow-2xl relative group border border-white/20">
                 <img className="w-full h-full object-cover brightness-110 group-hover:scale-105 transition-all duration-700" src="/surgical-mastery.png" alt="Surgeon hands" />
                 <div className="absolute inset-x-0 bottom-0 p-6 bg-gradient-to-t from-black/60 to-transparent">
-                  <p className="text-white font-black text-sm uppercase tracking-widest">Precision</p>
+                  <p className="text-white font-black text-sm uppercase">Precision</p>
                 </div>
               </div>
               <div className="aspect-[4/5] bg-secondary-fixed/20 rounded-[2rem] overflow-hidden shadow-2xl relative group border border-white/20">
@@ -83,7 +83,7 @@ export default function ExpertisePage() {
 
       {/* Expertise Grid */}
       <section className=" bg-white">
-        <div className="max-w-7xl mx-auto px-4">
+        <div className="max-w-7xl mx-auto px-4 py-12">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {expertiseAreas.map((area, i) => (
               <div key={i} className="group p-4 rounded-[1rem] bg-slate-50 border border-slate-100 hover:bg-white hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
@@ -104,7 +104,7 @@ export default function ExpertisePage() {
           <div className="flex flex-col lg:flex-row gap-20 items-center">
             <div className="lg:w-1/2 space-y-12">
               <div className="space-y-4">
-                <span className="text-secondary font-black uppercase text-sm tracking-widest">Academic Authority</span>
+                <span className="text-secondary font-black uppercase text-sm">Academic Authority</span>
                 <h2 className="text-3xl md:text-5xl font-black text-primary uppercase leading-tight">Fellowship <br /> & Global Membership</h2>
                 <div className="w-20 h-1.5 bg-secondary rounded-full"></div>
               </div>
@@ -127,9 +127,9 @@ export default function ExpertisePage() {
               </div>
             </div>
             <div className="lg:w-1/2 relative">
-              <div className="bg-white/70 backdrop-blur-md p-6 md:p-14 rounded-[2.5rem] shadow-3xl shadow-slate-200/50 relative z-10 border border-white">
-                <span className="text-[10rem] font-black text-slate-100/30 absolute right-10 top-0 select-none -z-0">MS</span>
-                <div className="relative z-10 space-y-12">
+              <div className="bg-white/70 backdrop-blur-md p-4 md:p-12 rounded-[1rem] shadow-3xl shadow-slate-200/50 relative z-10 border border-white">
+                <span className="text-[12rem] font-black text-slate-100/30 absolute right-10 top-0 select-none -z-0">MS</span>
+                <div className="relative z-10 space-y-8">
                   <div className="space-y-3">
                     <div className="inline-block px-3 py-1 bg-secondary/10 rounded-lg text-[10px] font-black text-secondary uppercase tracking-[0.2em] mb-2">Education Track</div>
                     <h4 className="text-2xl md:text-3xl font-black text-primary uppercase leading-tight">MBBS & MS Surgery</h4>
@@ -161,10 +161,10 @@ export default function ExpertisePage() {
               <div key={i} className="p-6 rounded-[1rem] bg-slate-50 hover:bg-white hover:shadow-2xl transition-all duration-700 border border-transparent hover:border-slate-100 flex flex-col justify-between">
                 <div>
                   <span className="text-sm font-black text-secondary captilize mb-4 block underline underline-offset-4 decoration-2">{bib.journal}</span>
-                  <h3 className="text-xl font-black text-primary captilize mb-4 leading-tight">{bib.title}</h3>
-                  <p className="text-xs text-slate-400 font-bold captilize mb-6">{bib.authors}</p>
+                  <h3 className="text-xl font-black text-primary captilize mb-4 ">{bib.title}</h3>
+                  <p className="text-sm text-slate-400 font-bold captilize mb-6">{bib.authors}</p>
                 </div>
-                <div className="bg-white p-4 rounded-xl border border-slate-100 italic text-sm text-slate-400 font-medium font-inter">
+                <div className="bg-white p-4 rounded-xl border border-slate-100 italic text-sm text-slate-500 font-medium ">
                   {bib.cite}
                 </div>
               </div>
