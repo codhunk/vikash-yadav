@@ -61,7 +61,7 @@ const Navbar = () => {
               <HeartPulse className="w-6 h-6" />
             </div>
             <span className="text-xl md:text-2xl font-bold font-manrope text-blue-900 shrink-0">
-              Dr. Vikas Yadav
+              Dr. Vikash Yadav
             </span>
           </Link>
 

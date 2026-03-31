@@ -2,9 +2,11 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "The Clinical Sanctuary | Dr. Vikas Yadav",
-  description: "Bespoke medical care and specialized treatment by Dr. Vikas Yadav. Experience a sanctuary of expertise and approachability.",
+  title: "The Clinical Sanctuary | Dr. Vikash Yadav",
+  description: "Bespoke medical care and specialized treatment by Dr. Vikash Yadav. Experience a sanctuary of expertise and approachability.",
 };
+
+import WhatsAppButton from "@/components/WhatsAppButton";
 
 export default function RootLayout({
   children,
@@ -21,6 +23,7 @@ export default function RootLayout({
       </head>
       <body className="font-inter antialiased bg-surface text-on-surface">
         {children}
+        <WhatsAppButton />
       </body>
     </html>
   );

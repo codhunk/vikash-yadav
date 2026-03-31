@@ -58,31 +58,24 @@
 
   --font-manrope: "Manrope", sans-serif;
   --font-inter: "Inter", sans-serif;
-  
-  --shadow-ambient: 0 8px 24px rgba(0, 71, 141, 0.06);
-}
 
-@layer base {
-  body {
-    @apply bg-surface text-on-surface font-inter antialiased selection:bg-secondary-container selection:text-on-secondary-container;
-    font-family: 'Inter', sans-serif;
-  }
-  
-  h1, h2, h3, h4 {
-    font-family: 'Manrope', sans-serif;
-  }
-  
-  .bg-pattern {
-    background-image: radial-gradient(#00478d10 1px, transparent 1px);
-    background-size: 24px 24px;
-  }
-}
+  --animate-fade-in-down: fade-in-down 0.8s ease-out forwards;
+  --animate-bounce-slow: bounce 3s infinite;
+  --animate-pulse-slow: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-zoom-in-out: zoom-in-out 2s ease-in-out infinite;
 
-@layer utilities {
-  .animate-bounce-slow {
-    animation: bounce 3s infinite;
+  @keyframes fade-in-down {
+    0% {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
-  
+
   @keyframes bounce {
     0%, 100% {
       transform: translateY(-5%);
@@ -92,5 +85,33 @@
       transform: translateY(0);
       animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
     }
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: .5; }
+  }
+
+  @keyframes zoom-in-out {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+  }
+
+  --shadow-ambient: 0 8px 24px rgba(0, 71, 141, 0.06);
+}
+
+@layer base {
+  body {
+    @apply bg-surface text-on-surface font-inter antialiased selection:bg-secondary-container selection:text-on-secondary-container;
+    font-family: 'Inter', sans-serif;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: 'Manrope', sans-serif;
+  }
+
+  .bg-pattern {
+    background-image: radial-gradient(#00478d10 1px, transparent 1px);
+    background-size: 24px 24px;
   }
 }

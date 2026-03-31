@@ -44,7 +44,7 @@ const Footer = () => {
               <span className="material-symbols-outlined text-3xl font-black">medical_information</span>
             </div>
             <div className="flex flex-col">
-              <span className="text-2xl font-manrope font-black text-white">Dr. Vikas Yadav</span>
+              <span className="text-2xl font-manrope font-black text-white">Dr. Vikash Yadav</span>
               <span className="text-[10px] font-inter font-bold text-secondary-fixed mt-1 tracking-wider">Clinical Sanctuary</span>
             </div>
           </div>
@@ -91,8 +91,8 @@ const Footer = () => {
 
       <div className="max-w-7xl mx-auto px-4 mt-12 pt-6 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-6">
         <div className="flex flex-col items-center md:items-start text-[10px] font-bold text-blue-100/40 leading-none font-inter group">
-          <p className="group-hover:text-white transition-colors">© 2024 The Clinical Sanctuary</p>
-          <p className="mt-2 text-[8px] opacity-50">Crafted with precision & excellence</p>
+          <p className="group-hover:text-white transition-colors">© 2024 The Clinical Sanctuary • Managed by <Link href="https://webduality.in" className="text-green-400 hover:text-secondary-fixed transition-all hover:scale-105 active:scale-95">WebDuality</Link></p>
+          <p className="mt-2 text-[8px] opacity-50 uppercase tracking-[0.1em]">Crafted with precision & excellence</p>
         </div>
         <div className="flex gap-8 font-inter text-[10px] font-black text-blue-100/30">
           <Link href="#" className="hover:text-secondary-fixed transition-all hover:scale-105 active:scale-95">Security</Link>

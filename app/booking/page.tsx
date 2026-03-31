@@ -61,7 +61,7 @@ export default function Booking() {
     <main className="bg-surface font-inter text-on-surface antialiased">
       <Navbar />
 
-      <div className="pt-24 pb-24 px-6 max-w-7xl mx-auto">
+      <div className="pt-24 pb-20 px-4 max-w-7xl mx-auto">
         <header className="mb-8 md:mb-12 max-w-3xl">
           <h1 className="font-manrope text-2xl md:text-3xl font-extrabold text-primary leading-tight mb-6 tracking-tight">
             Your Health Journey <br />Begins in Our <span className="text-secondary">Sanctuary</span>
@@ -92,7 +92,7 @@ export default function Booking() {
                     )}
                   >
                     <span className="material-symbols-outlined text-secondary text-3xl mb-4" style={{ fontVariationSettings: selectedService === service.id ? "'FILL' 1" : "" }}>{service.icon}</span>
-                    <h3 className="font-manrope font-black text-xs capitalize text-primary mb-2">{service.title}</h3>
+                    <h3 className="font-manrope font-black text-sm capitalize text-primary mb-2">{service.title}</h3>
                     <p className="text-sm text-on-surface-variant leading-relaxed font-medium opacity-60">{service.desc}</p>
                   </button>
                 ))}

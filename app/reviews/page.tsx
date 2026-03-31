@@ -38,30 +38,64 @@ export default function Reviews() {
     <main className="bg-surface font-inter text-on-surface antialiased">
       <Navbar />
 
-      <div className="pt-32 pb-24">
+      <div className="pt-16 pb-20">
         {/* Review Summary Section */}
-        <section className="max-w-7xl mx-auto px-8 mb-20">
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-12 items-center">
-            <div className="md:col-span-7">
-              <h1 className="font-manrope text-5xl md:text-6xl font-extrabold text-primary mb-6 tracking-tight leading-tight">
-                Measured by <span className="text-secondary italic">Excellence.</span> Defined by Trust.
-              </h1>
-              <p className="text-on-surface-variant text-lg max-w-xl font-medium leading-relaxed">
-                At the Clinical Sanctuary, every patient journey is a testament to our commitment to innovative care and human-centric medicine.
-              </p>
-            </div>
-            <div className="md:col-span-5">
-              <div className="bg-surface-container-lowest p-10 rounded-[2rem] shadow-sm border border-outline-variant/10 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-secondary/5 rounded-full -mr-16 -mt-16"></div>
-                <div className="relative z-10 flex flex-col items-center text-center">
-                  <div className="flex items-center gap-1 mb-2">
-                    {[...Array(4)].map((_, i) => (
-                      <span key={i} className="material-symbols-outlined text-secondary text-4xl" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-                    ))}
-                    <span className="material-symbols-outlined text-secondary text-4xl" style={{ fontVariationSettings: "'FILL' 1" }}>star_half</span>
+        <section className="relative bg-gradient-to-br from-[#002B5B] via-[#00478D] to-[#0d9488] pt-24 pb-24 overflow-hidden mb-20 text-white">
+          {/* Decorative Elements */}
+          <div className="absolute top-0 right-0 w-1/3 h-full bg-white/5 skew-x-12 translate-x-1/4 pointer-events-none z-0"></div>
+          <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-secondary/10 rounded-full blur-[100px] pointer-events-none"></div>
+
+          <div className="max-w-7xl mx-auto px-8 relative z-10 w-full">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 md:gap-24 items-center">
+              <div className="lg:col-span-7 space-y-8">
+                <div className="inline-flex items-center gap-3 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/20">
+                  <span className="w-2 h-2 rounded-full bg-secondary-fixed animate-pulse shadow-[0_0_8px_rgba(147,242,242,0.8)]"></span>
+                  <span className="text-[10px] font-manrope font-black text-secondary-fixed uppercase tracking-widest">Global Patient Trust</span>
+                </div>
+                <h1 className="font-manrope text-4xl md:text-6xl font-black text-white uppercase leading-[1.1] tracking-tight">
+                  Measured by <span className="text-secondary-fixed italic">Excellence.</span> <br />Defined by Trust.
+                </h1>
+                <p className="text-blue-100/80 text-base md:text-lg max-w-xl font-medium font-inter leading-relaxed">
+                  At the Clinical Sanctuary, every patient journey is a testament to our commitment to innovative care and human-centric medicine.
+                </p>
+                <div className="flex items-center gap-8 pt-4">
+                  <div className="flex items-center gap-2">
+                    <div className="text-3xl font-black text-secondary-fixed">98%</div>
+                    <div className="text-[10px] font-black text-blue-100/50 uppercase tracking-widest leading-none">Positive <br />Outcomes</div>
                   </div>
-                  <div className="text-6xl font-manrope font-black text-primary mb-1">4.9/5</div>
-                  <div className="text-on-surface-variant tracking-widest uppercase text-sm font-semibold">150+ Patient Testimonials</div>
+                  <div className="w-px h-10 bg-white/10"></div>
+                  <div className="flex items-center gap-2">
+                    <div className="text-3xl font-black text-white">4.9/5</div>
+                    <div className="text-[10px] font-black text-blue-100/50 uppercase tracking-widest leading-none">Google <br />Rating</div>
+                  </div>
+                </div>
+              </div>
+              <div className="lg:col-span-5 relative group">
+                <div className="absolute -inset-4 bg-gradient-to-tr from-secondary/30 to-primary/30 blur-2xl rounded-[1rem] opacity-40 group-hover:opacity-60 transition-opacity"></div>
+                <div className="bg-white/10 backdrop-blur-3xl p-10 rounded-[1rem] shadow-3xl shadow-black/30 border border-white/20 relative z-10 overflow-hidden transform group-hover:translate-y-[-10px] transition-transform duration-700">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-secondary-fixed/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
+                  <div className="relative z-10 flex flex-col items-center text-center space-y-6">
+                    <div className="flex items-center gap-2">
+                      {[...Array(5)].map((_, i) => (
+                        <span key={i} className="material-symbols-outlined text-secondary-fixed text-5xl" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+                      ))}
+                    </div>
+                    <div className="space-y-1">
+                      <div className="text-7xl font-manrope font-black text-white leading-none">4.9<span className="text-3xl text-blue-100/40">/5</span></div>
+                      <div className="text-blue-100/60 tracking-[0.2em] uppercase text-[10px] font-black">150+ Verified Testimonials</div>
+                    </div>
+                    <Link href="/booking" className="px-10 py-4 bg-secondary-container text-on-secondary-container rounded-xl font-black text-xs uppercase tracking-widest hover:bg-white hover:text-primary transition-all shadow-xl shadow-black/20">Write a Review</Link>
+                  </div>
+                </div>
+                {/* Floating reviews preview */}
+                <div className="absolute -bottom-10 -left-10 bg-white p-4 rounded-2xl shadow-2xl z-20 hidden lg:block border border-slate-100 transform -rotate-3 hover:rotate-0 transition-transform">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-slate-100"></div>
+                    <div className="w-24 h-2 bg-slate-100 rounded-full overflow-hidden relative">
+                      <div className="absolute inset-0 bg-secondary w-full"></div>
+                    </div>
+                  </div>
+                  <div className="mt-2 text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none">Exceeded Expectations</div>
                 </div>
               </div>
             </div>
@@ -69,7 +103,7 @@ export default function Reviews() {
         </section>
 
         {/* Voices of Trust: Testimonial Feed */}
-        <section className="max-w-7xl mx-auto px-8">
+        <section className="max-w-7xl mx-auto px-4">
           <div className="flex items-center justify-between mb-12">
             <h2 className="font-manrope text-3xl font-bold text-primary">Voices of Trust</h2>
             <div className="flex gap-4">
@@ -80,7 +114,7 @@ export default function Reviews() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Review 1 */}
-            <div className="bg-surface-container-lowest p-8 rounded-2xl flex flex-col justify-between hover:bg-surface-bright transition-all group border border-outline-variant/10 shadow-sm">
+            <div className="bg-surface-container-lowest p-4 rounded-xl flex flex-col justify-between hover:bg-surface-bright transition-all group border border-outline-variant/10 shadow-sm">
               <div>
                 <div className="flex items-center gap-0.5 mb-6">
                   {[...Array(5)].map((_, i) => (
@@ -101,10 +135,10 @@ export default function Reviews() {
             </div>
 
             {/* Review 2 (Large Highlight) */}
-            <div className="md:col-span-2 bg-primary-container/5 p-12 rounded-[2.5rem] border border-primary/5 flex flex-col md:flex-row gap-8 items-center group shadow-sm">
+            <div className="md:col-span-2 bg-primary-container/5 p-4 rounded-[1rem] border border-primary/5 flex flex-col md:flex-row gap-8 items-center group shadow-sm">
               <div className="flex-1">
                 <span className="material-symbols-outlined text-primary text-5xl mb-6 block opacity-20">format_quote</span>
-                <p className="text-2xl font-manrope font-semibold text-primary leading-tight mb-8">
+                <p className="text-xl font-manrope font-semibold text-primary leading-tight mb-8">
                   &quot;Innovation meets empathy here. The automated scheduling was seamless, but it was Dr. Yadav&apos;s personalized treatment plan that changed my life.&quot;
                 </p>
                 <div className="flex items-center gap-4">
@@ -118,7 +152,7 @@ export default function Reviews() {
                 </div>
               </div>
               <div className="hidden md:block w-1/3">
-                <div className="aspect-square bg-white rounded-3xl p-6 shadow-xl shadow-primary/10 rotate-3 group-hover:rotate-0 transition-transform duration-500 flex flex-col h-full justify-center items-center text-center">
+                <div className="aspect-square bg-white rounded-xl p-4 shadow-xl shadow-primary/10 rotate-3 group-hover:rotate-0 transition-transform duration-500 flex flex-col h-full justify-center items-center text-center">
                   <div className="text-4xl font-black text-primary mb-2">10/10</div>
                   <div className="text-xs uppercase tracking-widest font-bold text-on-surface-variant">Technical Precision</div>
                 </div>
@@ -127,7 +161,7 @@ export default function Reviews() {
 
             {/* Review 3, 4, 5 */}
             {reviews.slice(1).map((review, idx) => (
-              <div key={idx} className="bg-surface-container-lowest p-8 rounded-2xl flex flex-col justify-between hover:bg-surface-bright transition-all group border border-outline-variant/10 shadow-sm">
+              <div key={idx} className="bg-surface-container-lowest p-4 rounded-xl flex flex-col justify-between hover:bg-surface-bright transition-all group border border-outline-variant/10 shadow-sm">
                 <div>
                   <div className="flex items-center gap-0.5 mb-6">
                     {[...Array(review.rating)].map((_, i) => (
@@ -159,8 +193,8 @@ export default function Reviews() {
         </section>
 
         {/* Final CTA Section */}
-        <section className="max-w-7xl mx-auto px-8 mt-32">
-          <div className="relative rounded-[3rem] overflow-hidden bg-primary p-16 md:p-24 text-center">
+        <section className="max-w-7xl mx-auto px-4 mt-20">
+          <div className="relative rounded-[1rem] overflow-hidden bg-primary p-8 md:p-16 text-center">
             <div className="absolute inset-0 opacity-10 pointer-events-none bg-pattern"></div>
             <div className="relative z-10 max-w-2xl mx-auto">
               <h2 className="text-4xl md:text-5xl font-manrope font-extrabold text-white mb-6 leading-tight">Experience the Sanctuary</h2>

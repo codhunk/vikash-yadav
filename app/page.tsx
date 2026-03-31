@@ -17,7 +17,7 @@ export default function Home() {
           </div>
           <div className="max-w-7xl mx-auto w-full grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             <div className="z-10 space-y-4 md:space-y-6">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary-fixed text-on-secondary-fixed text-[10px] md:text-xs font-bold">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary-fixed text-on-secondary-fixed text-[10px] md:text-sm font-bold">
                 <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
                 Compassionate Excellence
               </div>
@@ -25,18 +25,18 @@ export default function Home() {
                 Experience Care <br /><span className="text-secondary-fixed">Beyond Expectations</span>
               </h1>
               <p className="text-base max-w-lg leading-relaxed font-body text-blue-100/90 font-medium">
-                Dr. Vikas Yadav is a highly skilled surgeon in Delhi specializing in general and minimal-access surgery at Manipal Hospital, Dwarka.
+                Dr. Vikash Yadav is a highly skilled surgeon in Delhi specializing in general and minimal-access surgery at Manipal Hospital, Dwarka.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 pt-4 md:pt-8 w-full sm:w-auto">
                 <Link
                   href="/booking"
-                  className="bg-secondary-fixed text-on-secondary-fixed px-10 py-4 rounded-xl font-black shadow-xl shadow-black/20 hover:scale-105 transition-all text-center text-xs"
+                  className="bg-secondary-fixed text-on-secondary-fixed px-10 py-4 rounded-xl font-black shadow-xl shadow-black/20 hover:scale-105 transition-all text-center text-sm"
                 >
                   Book Appointment
                 </Link>
                 <Link
                   href="#services"
-                  className="border border-white/30 text-white px-4 py-4 rounded-xl font-bold hover:bg-white/10 backdrop-blur-sm transition-all text-center text-xs"
+                  className="border border-white/30 text-white px-4 py-4 rounded-xl font-bold hover:bg-white/10 backdrop-blur-sm transition-all text-center text-sm"
                 >
                   View Services
                 </Link>
@@ -64,59 +64,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Stats & Pillars Section */}
-        <section className="bg-white py-12 relative overflow-hidden">
-          <div className="max-w-7xl mx-auto px-4">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
-              <div className="group text-center space-y-2">
-                <div className="text-4xl md:text-5xl font-manrope font-black text-primary group-hover:scale-110 transition-transform"><Counter value={15} suffix="+" /></div>
-                <div className="text-[10px] font-bold text-secondary">Years Experience</div>
-              </div>
-              <div className="group text-center space-y-2">
-                <div className="text-4xl md:text-5xl font-manrope font-black text-primary group-hover:scale-110 transition-transform"><Counter value={15} suffix="k+" /></div>
-                <div className="text-[10px] font-bold text-secondary">Patients Healed</div>
-              </div>
-              <div className="group text-center space-y-2">
-                <div className="text-4xl md:text-5xl font-manrope font-black text-primary group-hover:scale-110 transition-transform">FNB</div>
-                <div className="text-[10px] font-bold text-secondary">Certified Expert</div>
-              </div>
-              <div className="group text-center space-y-2">
-                <div className="text-4xl md:text-5xl font-manrope font-black text-primary group-hover:scale-110 transition-transform"><Counter value={4.9} suffix="/5" decimalPlaces={1} /></div>
-                <div className="text-[10px] font-bold text-secondary">Patient Rating</div>
-              </div>
-            </div>
 
-            <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="p-8 rounded-[1rem] bg-gradient-to-br from-white to-primary/5 border border-primary/10 flex items-start gap-6 hover:shadow-xl transition-all group">
-                <div className="w-12 h-12 rounded-xl bg-white flex items-center justify-center text-primary shadow-sm group-hover:bg-primary group-hover:text-white transition-colors">
-                  <span className="material-symbols-outlined font-light">verified_user</span>
-                </div>
-                <div>
-                  <h4 className="font-manrope font-extrabold text-primary text-sm">Accredited Excellence</h4>
-                  <p className="text-xs text-on-surface-variant mt-2 font-medium opacity-70">Fellowship-trained surgeon representing Manipal Hospitals.</p>
-                </div>
-              </div>
-              <div className="p-8 rounded-[1rem] bg-gradient-to-br from-white to-secondary/5 border border-secondary/10 flex items-start gap-6 hover:shadow-xl transition-all group">
-                <div className="w-12 h-12 rounded-xl bg-white flex items-center justify-center text-secondary shadow-sm group-hover:bg-secondary group-hover:text-white transition-colors">
-                  <span className="material-symbols-outlined font-light">precision_manufacturing</span>
-                </div>
-                <div>
-                  <h4 className="font-manrope font-extrabold text-primary text-sm">Precision Tech</h4>
-                  <p className="text-xs text-on-surface-variant mt-2 font-medium opacity-70">Utilizing advanced Robotic and Laser surgical systems.</p>
-                </div>
-              </div>
-              <div className="p-8 rounded-[1rem] bg-gradient-to-br from-white to-clinical-teal/5 border border-clinical-teal/10 flex items-start gap-6 hover:shadow-xl transition-all group">
-                <div className="w-12 h-12 rounded-xl bg-white flex items-center justify-center text-clinical-teal shadow-sm group-hover:bg-clinical-teal group-hover:text-white transition-colors">
-                  <span className="material-symbols-outlined font-light">home_health</span>
-                </div>
-                <div>
-                  <h4 className="font-manrope font-extrabold text-primary text-sm">Compassionate Ease</h4>
-                  <p className="text-xs text-on-surface-variant mt-2 font-medium opacity-70">Patient-centered care focusing on rapid, painless recovery.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
 
         {/* Services Section */}
         <section className="py-12 md:py-20 bg-slate-50/50 relative overflow-hidden" id="services">
@@ -137,11 +85,11 @@ export default function Home() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 space-y-6">
               {/* Card 1: Laparoscopic */}
-              <div className="group relative bg-white rounded-[1rem] md:rounded-[1rem] p-8 md:p-10 pt-20 shadow-xl shadow-blue-900/5 hover:shadow-xl transition-all duration-700">
-                <div className="absolute -top-8 md:-top-10 left-8 md:left-10 w-20 h-20 md:w-24 md:h-24 bg-primary rounded-full flex items-center justify-center text-white shadow-xl shadow-primary/40 group-hover:scale-110 transition-transform duration-500">
+              <div className="group relative bg-white rounded-[1rem] md:rounded-[1rem] p-6 md:p-10 pt-20 shadow-xl shadow-blue-900/5 hover:shadow-xl transition-all duration-700">
+                <div className="absolute -top-7 md:-top-14 left-8 md:left-10 w-18 h-18 md:w-20 md:h-20 bg-primary rounded-full flex items-center justify-center text-white shadow-xl shadow-primary/40 group-hover:scale-110 transition-transform duration-500">
                   <span className="material-symbols-outlined text-3xl md:text-4xl">stethoscope</span>
                 </div>
-                <div className="space-y-6">
+                <div className="space-y-4">
                   <h3 className="text-xl md:text-xl font-manrope font-black text-slate-900 whitespace-pre-line">Laparoscopic{"\n"}Surgery</h3>
                   <div className="w-10 h-1 bg-secondary rounded-full"></div>
                   <p className="text-[13px] md:text-sm text-slate-500 leading-relaxed font-inter font-medium">Advanced procedures for Gall Bladder, Appendix, and Hernia with specialized rapid recovery protocols.</p>
@@ -156,8 +104,8 @@ export default function Home() {
               </div>
 
               {/* Card 2: Robotic & Bariatric */}
-              <div className="group relative bg-white rounded-[1rem] md:rounded-[1rem] p-8 md:p-10 pt-20 shadow-xl shadow-teal-900/5 hover:shadow-xl transition-all duration-700">
-                <div className="absolute -top-8 md:-top-10 left-8 md:left-10 w-20 h-20 md:w-24 md:h-24 bg-secondary rounded-full flex items-center justify-center text-white shadow-xl shadow-secondary/40 group-hover:scale-110 transition-transform duration-500">
+              <div className="group relative bg-white rounded-[1rem] md:rounded-[1rem] p-6 md:p-10 pt-20 shadow-xl shadow-teal-900/5 hover:shadow-xl transition-all duration-700">
+                <div className="absolute -top-8 md:-top-14 left-8 md:left-10 w-18 h-18 md:w-20 md:h-20 bg-secondary rounded-full flex items-center justify-center text-white shadow-xl shadow-secondary/40 group-hover:scale-110 transition-transform duration-500">
                   <span className="material-symbols-outlined text-3xl md:text-4xl">robot_2</span>
                 </div>
                 <div className="space-y-6">
@@ -175,8 +123,8 @@ export default function Home() {
               </div>
 
               {/* Card 3: Laser & Proctology */}
-              <div className="group relative bg-white rounded-[1rem] md:rounded-[1rem] p-8 md:p-10 pt-20 shadow-xl shadow-emerald-900/5 hover:shadow-xl transition-all duration-700">
-                <div className="absolute -top-8 md:-top-10 left-8 md:left-10 w-20 h-20 md:w-24 md:h-24 bg-clinical-teal rounded-full flex items-center justify-center text-white shadow-xl shadow-teal-900/40 group-hover:scale-110 transition-transform duration-500">
+              <div className="group relative bg-white rounded-[1rem] md:rounded-[1rem] p-6 md:p-10 pt-20 shadow-xl shadow-emerald-900/5 hover:shadow-xl transition-all duration-700">
+                <div className="absolute -top-8 md:-top-14 left-8 md:left-10 w-18 h-18 md:w-20 md:h-20 bg-clinical-teal rounded-full flex items-center justify-center text-white shadow-xl shadow-teal-900/40 group-hover:scale-110 transition-transform duration-500">
                   <span className="material-symbols-outlined text-3xl md:text-4xl">health_and_safety</span>
                 </div>
                 <div className="space-y-6">
@@ -190,6 +138,77 @@ export default function Home() {
                     See Procedures
                     <span className="material-symbols-outlined text-lg">arrow_outward</span>
                   </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Stats & Pillars Section */}
+        <section className="bg-gradient-to-b from-[#001229] to-[#002B5B] py-20 relative overflow-hidden">
+          {/* Abstract background elements */}
+          <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-blue-500/30 to-transparent"></div>
+          <div className="absolute -top-24 -right-24 w-96 h-96 bg-primary/20 rounded-full blur-[100px]"></div>
+          <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-secondary/10 rounded-full blur-[100px]"></div>
+
+          <div className="max-w-7xl mx-auto px-4 relative z-10">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
+              <div className="group flex flex-col items-center">
+                <div className="w-32 h-32 md:w-44 md:h-44 rounded-full border border-white/10 bg-white/5 backdrop-blur-xl flex flex-col items-center justify-center p-4 relative group-hover:border-secondary-fixed/50 transition-all duration-700 shadow-2xl shadow-black/40">
+                  <div className="absolute inset-2 rounded-full border border-white/5 animate-pulse-slow"></div>
+                  <div className="text-3xl md:text-4xl font-manrope font-black text-white group-hover:scale-110 transition-transform duration-500"><Counter value={15} suffix="+" /></div>
+                  <div className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-secondary-fixed mt-2 text-center ">Years Experience</div>
+                </div>
+              </div>
+              <div className="group flex flex-col items-center">
+                <div className="w-32 h-32 md:w-44 md:h-44 rounded-full border border-white/10 bg-white/5 backdrop-blur-xl flex flex-col items-center justify-center p-4 relative group-hover:border-secondary-fixed/50 transition-all duration-700 shadow-2xl shadow-black/40">
+                  <div className="absolute inset-2 rounded-full border border-white/5 animate-pulse-slow"></div>
+                  <div className="text-3xl md:text-4xl font-manrope font-black text-white group-hover:scale-110 transition-transform duration-500"><Counter value={15} suffix="k+" /></div>
+                  <div className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-secondary-fixed mt-2 text-center ">Patients Healed</div>
+                </div>
+              </div>
+              <div className="group flex flex-col items-center">
+                <div className="w-32 h-32 md:w-44 md:h-44 rounded-full border border-white/10 bg-white/5 backdrop-blur-xl flex flex-col items-center justify-center p-4 relative group-hover:border-secondary-fixed/50 transition-all duration-700 shadow-2xl shadow-black/40">
+                  <div className="absolute inset-2 rounded-full border border-white/5 animate-pulse-slow"></div>
+                  <div className="text-3xl md:text-4xl font-manrope font-black text-white group-hover:scale-110 transition-transform duration-500">FNB</div>
+                  <div className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-secondary-fixed mt-2 text-center ">Certified Expert</div>
+                </div>
+              </div>
+              <div className="group flex flex-col items-center">
+                <div className="w-32 h-32 md:w-44 md:h-44 rounded-full border border-white/10 bg-white/5 backdrop-blur-xl flex flex-col items-center justify-center p-4 relative group-hover:border-secondary-fixed/50 transition-all duration-700 shadow-2xl shadow-black/40">
+                  <div className="absolute inset-2 rounded-full border border-white/5 animate-pulse-slow"></div>
+                  <div className="text-3xl md:text-4xl font-manrope font-black text-white group-hover:scale-110 transition-transform duration-500"><Counter value={4.9} suffix="/5" decimalPlaces={1} /></div>
+                  <div className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-secondary-fixed mt-2 text-center ">Patient Rating</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-24 grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="p-4 rounded-[2rem] bg-white/5 backdrop-blur-md border border-white/10 flex items-start gap-6 hover:bg-white/10 transition-all group">
+                <div className="w-14 h-14 rounded-2xl bg-primary/20 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all shadow-lg">
+                  <span className="material-symbols-outlined font-light text-3xl">verified_user</span>
+                </div>
+                <div>
+                  <h4 className="font-manrope font-extrabold text-white text-base">Accredited Excellence</h4>
+                  <p className="text-sm text-blue-100/60 mt-2 font-medium leading-relaxed">Fellowship-trained surgeon representing Manipal Hospitals.</p>
+                </div>
+              </div>
+              <div className="p-4 rounded-[2rem] bg-white/5 backdrop-blur-md border border-white/10 flex items-start gap-6 hover:bg-white/10 transition-all group border-secondary/20">
+                <div className="w-14 h-14 rounded-2xl bg-secondary/20 flex items-center justify-center text-secondary-fixed group-hover:bg-secondary-fixed group-hover:text-on-secondary-fixed transition-all shadow-lg">
+                  <span className="material-symbols-outlined font-light text-3xl">precision_manufacturing</span>
+                </div>
+                <div>
+                  <h4 className="font-manrope font-extrabold text-white text-base">Precision Tech</h4>
+                  <p className="text-sm text-blue-100/60 mt-2 font-medium leading-relaxed">Utilizing advanced Robotic and Laser surgical systems.</p>
+                </div>
+              </div>
+              <div className="p-4 rounded-[2rem] bg-white/5 backdrop-blur-md border border-white/10 flex items-start gap-6 hover:bg-white/10 transition-all group">
+                <div className="w-14 h-14 rounded-2xl bg-clinical-teal/20 flex items-center justify-center text-clinical-teal group-hover:bg-clinical-teal group-hover:text-white transition-all shadow-lg">
+                  <span className="material-symbols-outlined font-light text-3xl">home_health</span>
+                </div>
+                <div>
+                  <h4 className="font-manrope font-extrabold text-white text-base">Compassionate Ease</h4>
+                  <p className="text-sm text-blue-100/60 mt-2 font-medium leading-relaxed">Patient-centered care focusing on rapid, painless recovery.</p>
                 </div>
               </div>
             </div>
@@ -214,13 +233,13 @@ export default function Home() {
               <div className="w-full lg:w-1/2 space-y-6 md:space-y-8 text-center lg:text-left">
                 <div className="space-y-4">
                   <span className="text-secondary font-black text-[10px] px-3 py-1 bg-secondary/10 rounded-lg">Practitioner Vision</span>
-                  <h2 className="text-3xl md:text-5xl font-bold text-primary leading-tight">A Journey Rooted <br />in Empathy</h2>
+                  <h2 className="text-3xl md:text-5xl font-bold text-primary ">A Journey Rooted <br />in Empathy</h2>
                 </div>
                 <div className="space-y-4 text-on-surface-variant text-base leading-relaxed font-medium">
-                  <p>Dr. Vikas Yadav established the Clinical Sanctuary to bridge the gap between clinical excellence and human warmth.</p>
+                  <p>Dr. Vikash Yadav established the Clinical Sanctuary to bridge the gap between clinical excellence and human warmth.</p>
                   <p>As a senior surgeon at Manipal Hospital, Dwarka, he utilizes the latest diagnostic technologies while maintaining a peaceful, reassuring environment.</p>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 md:gap-8 py-8 border-y border-secondary/10">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 md:gap-4 py-8 border-y border-secondary/10">
                   <div className="space-y-1">
                     <div className="text-[10px] font-black text-secondary">Education</div>
                     <div className="text-on-surface font-extrabold font-manrope text-sm">MBBS, PGIMS Rohtak | MS Surgery</div>
@@ -258,7 +277,7 @@ export default function Home() {
                       <span className="material-symbols-outlined font-light text-3xl">{item.icon}</span>
                     </div>
                     <h3 className="text-xl font-manrope font-black text-slate-900">{item.title}</h3>
-                    <p className="text-xs text-on-surface-variant leading-relaxed font-medium opacity-70">{item.desc}</p>
+                    <p className="text-sm text-on-surface-variant leading-relaxed font-medium opacity-70">{item.desc}</p>
                   </div>
                 </div>
               ))}
@@ -299,7 +318,7 @@ export default function Home() {
                   </div>
                   <div>
                     <div className="font-bold text-white">Sarah Jenkins</div>
-                    <div className="text-xs text-blue-200">Tech Executive</div>
+                    <div className="text-sm text-blue-200">Tech Executive</div>
                   </div>
                 </div>
               </div>
@@ -325,7 +344,7 @@ export default function Home() {
                   </div>
                   <div>
                     <div className="font-bold text-white">David Chen</div>
-                    <div className="text-xs text-blue-200">Retired Professor</div>
+                    <div className="text-sm text-blue-200">Retired Professor</div>
                   </div>
                 </div>
               </div>
@@ -352,7 +371,7 @@ export default function Home() {
                   </div>
                   <div>
                     <div className="font-bold text-white">Elena Rodriguez</div>
-                    <div className="text-xs text-blue-200">Marketing Director</div>
+                    <div className="text-sm text-blue-200">Marketing Director</div>
                   </div>
                 </div>
               </div>
@@ -378,8 +397,8 @@ export default function Home() {
                     <span className="material-symbols-outlined font-light">location_on</span>
                   </div>
                   <div>
-                    <p className="text-xs font-black text-primary">Location</p>
-                    <p className="text-[10px] font-bold text-slate-400">Sector 6 Adjoining MTNL Bldg, Dwarka, New Delhi</p>
+                    <p className="text-sm font-black text-primary">Location</p>
+                    <p className="text-[12px] font-bold text-slate-500">Sector 6 Adjoining MTNL Bldg, Dwarka, New Delhi</p>
                   </div>
                 </div>
               </div>
@@ -392,7 +411,7 @@ export default function Home() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent"></div>
                 </div>
-                <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-secondary rounded-[1rem] -z-0 opacity-20"></div>
+                <div className="absolute -bottom-6 -right-4 w-28 h-28 bg-secondary rounded-[1rem] -z-0 opacity-20"></div>
               </div>
             </div>
           </div>
@@ -404,7 +423,7 @@ export default function Home() {
             <div className="absolute inset-0 bg-pattern opacity-10"></div>
             <div className="relative z-10 space-y-2">
               <div className="inline-block px-4 py-2 bg-white/20 backdrop-blur-md rounded-full text-white text-sm font-bold tracking-widest">Take the first step</div>
-              <h2 className="text-xl md:text-4xl font-extrabold text-white leading-tight tracking-tight">Ready to Prioritize <br />Your Wellbeing?</h2>
+              <h2 className="text-xl md:text-4xl font-extrabold text-white  tracking-tight">Ready to Prioritize <br />Your Wellbeing?</h2>
               <p className="text-blue-50 text-base max-w-xl mx-auto font-body opacity-90 font-medium">Step into the sanctuary. Our booking portal is open for new patient consultations and specialized follow-up care.</p>
               <div className="flex flex-col md:flex-row justify-center gap-6 pt-6">
                 <Link
