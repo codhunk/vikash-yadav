@@ -97,17 +97,14 @@ export default function ContactPage() {
                </div>
                <div className="flex-1 w-full relative">
                   <div className="aspect-square bg-slate-200 rounded-[1rem] overflow-hidden shadow-2xl relative z-10 border-8 border-white group">
-                     <img
-                        className="w-full h-full object-cover transition-all duration-700 group-hover:scale-105"
-                        src="/clinic-sanctuary.png"
-                        alt="Clinic Location Map Placeholder"
+                     <iframe
+                        src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d56049.393750083815!2d77.0674824!3d28.597163449999996!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2sin!4v1774947666982!5m2!1sen!2sin"
+                        className="w-full h-full border-0 grayscale hover:grayscale-0 transition-all duration-700"
+                        allowFullScreen
+                        loading="lazy"
+                        referrerPolicy="no-referrer-when-downgrade"
                      />
-                     <div className="absolute inset-0 bg-primary/20 pointer-events-none transition-opacity group-hover:opacity-0"></div>
-                     <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-20 h-20 rounded-full bg-white text-secondary flex items-center justify-center shadow-2xl animate-bounce-slow">
-                           <span className="material-symbols-outlined text-4xl">location_on</span>
-                        </div>
-                     </div>
+                     <div className="absolute inset-0 bg-primary/5 pointer-events-none transition-opacity group-hover:opacity-0"></div>
                   </div>
                   <div className="absolute -top-10 -right-10 w-64 h-64 bg-secondary/10 rounded-full blur-3xl opacity-60"></div>
                </div>
