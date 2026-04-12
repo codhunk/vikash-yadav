@@ -1,17 +1,60 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 
-const dailySchedule = [
-  { time: "09:00 AM", name: "Aarav Sharma", service: "General Consultation", status: "Confirmed", color: "border-secondary" },
-  { time: "10:30 AM", name: "Priya Iyer", service: "Pediatric Follow-up", status: "Pending", color: "border-primary" },
-  { time: "11:15 AM", name: "Vikram Sethi", service: "Diabetes Review", status: "Confirmed", color: "border-secondary/40" },
-  { time: "01:00 PM", name: "Ananya Reddy", service: "Initial Screening", status: "Cancelled", color: "border-error/50", cancelled: true },
-  { time: "02:30 PM", name: "Kabir Das", service: "Post-Op Checkup", status: "Confirmed", color: "border-secondary" },
-];
+interface Booking {
+  _id: string;
+  name: string;
+  email: string;
+  phone: string;
+  date: string;
+  time: string;
+  service: string;
+  status: string;
+  createdAt: string;
+}
 
 export default function AdminAppointments() {
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("All Status");
+
+  useEffect(() => {
+    fetchBookings();
+  }, []);
+
+  const fetchBookings = async () => {
+    try {
+      const res = await fetch("/api/bookings");
+      const data = await res.json();
+      if (data.success) {
+        setBookings(data.data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch bookings:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleStatusUpdate = async (id: string, newStatus: string) => {
+    try {
+      const res = await fetch(`/api/bookings/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus })
+      });
+      const data = await res.json();
+      if (data.success) {
+        fetchBookings(); // Refresh the list
+      }
+    } catch (error) {
+      console.error("Failed to update status:", error);
+    }
+  };
 
   const daysInMonth = (month: number, year: number) => new Date(year, month + 1, 0).getDate();
   const firstDayOfMonth = (month: number, year: number) => new Date(year, month, 1).getDay();
@@ -39,9 +82,18 @@ export default function AdminAppointments() {
   const prevMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 0);
   const prevMonthDaysToShow = Array.from({ length: startDay }, (_, i) => prevMonth.getDate() - startDay + i + 1);
 
+  // Filter daily schedule for the selected/current date
+  const selectedDateStr = currentDate.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
+  const dailySchedule = bookings.filter(b => b.date === selectedDateStr);
+
+  const filteredBookings = bookings.filter(b => {
+    const matchesSearch = b.name.toLowerCase().includes(searchQuery.toLowerCase()) || b.phone.includes(searchQuery);
+    const matchesStatus = statusFilter === "All Status" || b.status.toLowerCase() === statusFilter.toLowerCase();
+    return matchesSearch && matchesStatus;
+  });
+
   return (
     <div className="space-y-6">
-      {/* Header Section */}
       <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
           <h2 className="text-2xl font-manrope font-black text-primary tracking-tight capitalize">Appointment Scheduler</h2>
@@ -60,9 +112,7 @@ export default function AdminAppointments() {
         </div>
       </header>
 
-      {/* Bento Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Calendar & Filters */}
         <div className="lg:col-span-8 space-y-10">
           <section className="bg-white p-6 rounded-[1rem] shadow-sm border border-outline-variant/5">
             <div className="flex flex-wrap items-end gap-8">
@@ -70,12 +120,22 @@ export default function AdminAppointments() {
                 <label className="block text-[10px] font-black capitalize tracking-[0.2em] text-slate-400 mb-3 ml-1">Search Patient</label>
                 <div className="relative group">
                   <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-primary transition-colors">search</span>
-                  <input className="w-full pl-12 pr-6 py-4 bg-slate-50 border-2 border-transparent focus:border-primary/20  text-sm font-medium outline-none transition-all" placeholder="Patient Name or Case ID..." type="text" />
+                  <input 
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full pl-12 pr-6 py-4 bg-slate-50 border-2 border-transparent focus:border-primary/20  text-sm font-medium outline-none transition-all" 
+                    placeholder="Patient Name or Phone..." 
+                    type="text" 
+                  />
                 </div>
               </div>
               <div className="w-48">
                 <label className="block text-[10px] font-black capitalize tracking-[0.2em] text-slate-400 mb-3 ml-1">Status</label>
-                <select className="w-full bg-slate-50 border-2 border-transparent focus:border-primary/20  px-6 py-4 text-[10px] font-black capitalize tracking-widest outline-none cursor-pointer text-primary">
+                <select 
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="w-full bg-slate-50 border-2 border-transparent focus:border-primary/20  px-6 py-4 text-[10px] font-black capitalize tracking-widest outline-none cursor-pointer text-primary"
+                >
                   <option>All Status</option>
                   <option>Confirmed</option>
                   <option>Pending</option>
@@ -111,67 +171,93 @@ export default function AdminAppointments() {
                   <div key={`prev-${d}`} className="h-24 md:h-32 p-4 text-slate-200 text-xs font-bold opacity-30">{d}</div>
                 ))}
 
-                {Array.from({ length: monthDays }, (_, i) => i + 1).map(day => (
-                  <div
-                    key={day}
-                    className={`h-18 md:h-20 p-4 rounded-[1.5rem] md:rounded-[1rem] relative border-2 transition-all cursor-pointer group flex flex-col justify-between ${isToday(day)
-                      ? 'bg-primary text-white shadow-2xl shadow-primary/30 ring-4 ring-primary-container/10 border-primary'
-                      : 'bg-slate-50 border-transparent hover:border-secondary'
-                      }`}
-                  >
-                    <span className={`text-xs font-black ${isToday(day) ? 'text-white' : 'text-primary'}`}>
-                      {day < 10 ? `0${day}` : day}
-                    </span>
-                    {isToday(day) && (
-                      <div className="mt-auto text-[8px] md:text-[9px] leading-tight font-black capitalize tracking-[0.1em] md:tracking-[0.2em] opacity-80 decoration-secondary underline decoration-2 underline-offset-4">Today</div>
-                    )}
-                    {!isToday(day) && day % 7 === 0 && (
-                      <div className="absolute bottom-4 left-4 right-4"><div className="h-1 w-full bg-secondary rounded-[1rem] shadow-sm"></div></div>
-                    )}
-                    {!isToday(day) && day % 11 === 0 && (
-                      <div className="absolute bottom-4 left-4 right-4 space-y-1.5">
-                        <div className="h-1 w-full bg-primary/20 rounded-full"></div>
-                        <div className="h-1 w-3/4 bg-secondary rounded-full"></div>
-                      </div>
-                    )}
-                  </div>
-                ))}
+                {Array.from({ length: monthDays }, (_, i) => i + 1).map(day => {
+                  const dayObj = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+                  const dateStr = dayObj.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
+                  const bookingsCount = bookings.filter(b => b.date === dateStr).length;
+
+                  return (
+                    <div
+                      key={day}
+                      onClick={() => setCurrentDate(dayObj)}
+                      className={cn(
+                        "h-18 md:h-20 p-4 rounded-[1.5rem] md:rounded-[1rem] relative border-2 transition-all cursor-pointer group flex flex-col justify-between",
+                        isToday(day)
+                          ? 'bg-primary text-white shadow-2xl shadow-primary/30 ring-4 ring-primary-container/10 border-primary'
+                          : 'bg-slate-50 border-transparent hover:border-secondary'
+                      )}
+                    >
+                      <span className={cn("text-xs font-black", isToday(day) ? 'text-white' : 'text-primary')}>
+                        {day < 10 ? `0${day}` : day}
+                      </span>
+                      {bookingsCount > 0 && !isToday(day) && (
+                        <div className="flex h-1.5 w-1.5 bg-secondary rounded-full mx-auto mt-1 animate-pulse"></div>
+                      )}
+                      {isToday(day) && (
+                        <div className="mt-auto text-[8px] md:text-[9px] leading-tight font-black capitalize tracking-[0.1em] md:tracking-[0.2em] opacity-80 decoration-secondary underline decoration-2 underline-offset-4">Today</div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </section>
         </div>
 
-        {/* Daily Schedule */}
         <div className="lg:col-span-4 h-full">
           <div className="bg-white rounded-[1rem] p-6 h-full flex flex-col shadow-sm border border-outline-variant/10">
             <div className="flex items-center justify-between mb-10">
               <div className="flex items-center gap-3">
                 <div className="w-2 h-2 rounded-full bg-secondary animate-pulse shadow-[0_0_10px_rgba(3,192,192,0.5)]"></div>
-                <h3 className="text-lg font-manrope font-black text-primary capitalize tracking-tight">Daily Schedule</h3>
+                <h3 className="text-lg font-manrope font-black text-primary capitalize tracking-tight">Schedule for {selectedDateStr}</h3>
               </div>
-              <span className="text-[10px] font-black text-secondary capitalize tracking-[0.2em]">
-                {currentDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-              </span>
             </div>
 
             <div className="space-y-6 flex-grow overflow-y-auto pr-2 custom-scrollbar">
-              {dailySchedule.map((appt, i) => (
-                <div key={i} className={`group bg-slate-50 p-4 rounded-[1rem] hover:shadow-xl transition-all cursor-pointer border-l-4 ${appt.color} ${appt.cancelled ? 'opacity-40' : ''}`}>
-                  <div className="flex justify-between items-start mb-4">
-                    <span className="text-[10px] font-black text-slate-400 capitalize tracking-widest">{appt.time}</span>
-                    <span className={`px-3 py-1 rounded-full text-[9px] font-black capitalize tracking-widest ${appt.status === 'Cancelled' ? 'bg-error/10 text-error' :
-                      appt.status === 'Pending' ? 'bg-primary/10 text-primary' : 'bg-secondary/10 text-secondary'
-                      }`}>{appt.status}</span>
-                  </div>
-                  <h4 className={`font-black text-primary font-manrope tracking-tight leading-tight group-hover:text-secondary transition-colors ${appt.cancelled ? 'line-through' : ''}`}>{appt.name}</h4>
-                  <p className="text-[10px] font-bold text-slate-400 mt-2 capitalize tracking-widest">{appt.service}</p>
+              {isLoading ? (
+                <p className="text-center py-10 text-slate-400 font-bold">Loading schedule...</p>
+              ) : dailySchedule.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-10 opacity-40">
+                  <span className="material-symbols-outlined text-4xl mb-2">event_busy</span>
+                  <p className="text-center text-xs font-bold text-slate-400">No appointments</p>
                 </div>
-              ))}
+              ) : (
+                dailySchedule.map((appt, i) => (
+                  <div key={appt._id} className={cn(
+                    "group bg-slate-50 p-4 rounded-[1rem] hover:shadow-xl transition-all cursor-pointer border-l-4",
+                    appt.status === 'confirmed' ? 'border-secondary' : 'border-primary'
+                  )}>
+                    <div className="flex justify-between items-start mb-4">
+                      <span className="text-[10px] font-black text-slate-400 capitalize tracking-widest">{appt.time}</span>
+                      <div className="flex flex-col items-end gap-2">
+                        <span className={cn(
+                          "px-3 py-1 rounded-full text-[9px] font-black capitalize tracking-widest",
+                          appt.status === 'cancelled' ? 'bg-error/10 text-error' :
+                          appt.status === 'pending' ? 'bg-primary/10 text-primary' : 'bg-secondary/10 text-secondary'
+                        )}>{appt.status}</span>
+                        {appt.status === 'pending' && (
+                          <button 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleStatusUpdate(appt._id, 'confirmed');
+                            }}
+                            className="bg-secondary text-white px-3 py-1 rounded-lg text-[8px] font-black uppercase tracking-tighter hover:scale-105 active:scale-95 transition-all shadow-sm shadow-secondary/20"
+                          >
+                            Confirm Now
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                    <h4 className="font-black text-primary font-manrope tracking-tight leading-tight group-hover:text-secondary transition-colors">{appt.name}</h4>
+                    <p className="text-[10px] font-bold text-slate-400 mt-2 capitalize tracking-widest">{appt.service}</p>
+                  </div>
+                ))
+              )}
             </div>
 
             <button className="mt-10 w-full py-6 px-4 bg-white border-2 border-dashed border-slate-200 rounded-[1rem] text-slate-400 font-black text-[10px] capitalize tracking-[0.2em] hover:bg-slate-50 hover:border-secondary hover:text-secondary transition-all flex items-center justify-center gap-3">
               <span className="material-symbols-outlined text-lg">more_time</span>
-              Add Urgent Gap
+              Update Availability
             </button>
           </div>
         </div>

@@ -1,155 +1,442 @@
+"use client";
+import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
+import { X, UserPlus, Loader2, CheckCircle2 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
-const patients = [
-  {
-    name: "Arjun Sharma",
-    email: "arjun.sharma@email.com",
-    id: "#PS-90210",
-    ageGender: "42 / Male",
-    lastVisit: "Oct 24, 2023",
-    status: "Active",
-    img: "https://lh3.googleusercontent.com/aida-public/AB6AXuAjhI1ZQrH1lwASHpXCwykX9fGqUaMg9Dj8Fhz-fkLoVIyv0CWNf9iJoU-qQn160RadL6kGP0z6Pvj7wrQC1mZDw2hpgLRFEnoOeAR6N9mSrOMU_0e8oB_CMlEAAn_LbGe7zDC8s0VKIursBw9kAtTwvrh3RBrUpvXV4vbnW0YFDGE2CvT-7P3eUebz8Tjb_2TUDv6wB9FXhTKXM1FLZ9PchO9p27KdxTM7_oSFciobb4GS_5OvT8J4p6pLiQA95VxUcHk2_e-NuQ",
-    color: "bg-primary-fixed",
-  },
-  {
-    name: "Priya Patel",
-    email: "priya.p@email.com",
-    id: "#PS-88432",
-    ageGender: "29 / Female",
-    lastVisit: "Nov 12, 2023",
-    status: "Active",
-    img: "https://lh3.googleusercontent.com/aida-public/AB6AXuBPK2QJMdM0JpCL1cSiewjWD6_0HXCiF7CCC8KBbNZwv0qfe2KYfRr7o-gih51vHFRAxAazYSXVD35AFeFkZB3G4C6ttpfJE1NRTn9dExOTMFuACGJUqnH3VAWi5_4S04YgqEk9u7veD6nS40ShmHc6fLAduR7ZD1rf4i2mkK7HsaXMDX8649EdqKFeyB1W7ypw_gCMIW9bpisr2PV7Ob8MSo1pwA8MIAJ2mriJokf2V_o9WFTt1CuqxX0BuOAexDniNnEF9hCccA",
-    color: "bg-secondary-fixed",
-  },
-  {
-    name: "Vikram Singh",
-    email: "v.singh@provider.net",
-    id: "#PS-77219",
-    ageGender: "68 / Male",
-    lastVisit: "Aug 05, 2023",
-    status: "Inactive",
-    img: "https://lh3.googleusercontent.com/aida-public/AB6AXuA3t2nxZ2vmlLtbBxsTofeiOaHE7XLiRrtoTaZ4BN5QTjuotY3Z0Vkh-lSXWBN7bKCFPsHlI5CM9DmVgAmK6RIEkx-LDFtgQO90W_eoyAmonTHqvrECEN7ExQ2E80tMX2Gltf41PuJ22VhZD3f2aUPCeXTnYGcmQAJmXh0mdvHt-9cWOivxsOaeyglOvbRJyEEZcQtun7GxPM75RLzQzkHlO5-po2DPUCWAAKBvQdunazQD7nDqpK-n5-MHnkDGY0PBW1BTINKQTQ",
-    color: "bg-tertiary-fixed",
-  },
-  {
-    name: "Ananya Rao",
-    email: "arao.family@email.com",
-    id: "#PS-95561",
-    ageGender: "08 / Female",
-    lastVisit: "Dec 01, 2023",
-    status: "Active",
-    img: "https://lh3.googleusercontent.com/aida-public/AB6AXuC1p678k9csd090m1883yCD9r4imlo7czpsHrN938yfFKL3NRQOKMMyEKTobJ6Ez4Qh4QM0qwV5R47WWKP-5nJEV7mhctBoSHqib8cVbec5lerp8SHPZCSP_a8qASSKtDmeWX4ck_eNeUT9dkOs4TM-K-wtJ-mGHgKJ71j7c1IPWxdE3UIqYXW5vSJDpAqGcEbxR4ObMI2mI6dhX6bwrDEcZ9GWkZ8ggC92_-ttEKm-KdH_sm8vBBB8PlcsiNcV7AMMf7EKVLzOYg",
-    color: "bg-primary-fixed",
-  },
-];
+interface Patient {
+  _id: string;
+  name: string;
+  email: string;
+  phone: string;
+  age?: number;
+  gender?: string;
+  status: string;
+  registeredBy: string;
+  lastVisit?: string;
+  createdAt: string;
+}
 
 export default function PatientsDirectory() {
+  const [patients, setPatients] = useState<Patient[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isBroadcastOpen, setIsBroadcastOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+
+  const [broadcastData, setBroadcastData] = useState({
+    subject: "Clinical Update - Dr. Vikash Yadav",
+    message: ""
+  });
+
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    age: "",
+    gender: "Male"
+  });
+
+  useEffect(() => {
+    fetchPatients();
+  }, []);
+
+  const fetchPatients = async () => {
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/patients");
+      const data = await res.json();
+      if (data.success) {
+        setPatients(data.data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch patients:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleCreatePatient = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setMessage(null);
+
+    try {
+      const res = await fetch("/api/patients", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...formData,
+          age: parseInt(formData.age)
+        })
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        setMessage({ type: 'success', text: 'Patient record created successfully!' });
+        fetchPatients();
+        setTimeout(() => {
+          setIsModalOpen(false);
+          setFormData({ name: "", email: "", phone: "", age: "", gender: "Male" });
+          setMessage(null);
+        }, 2000);
+      } else {
+        setMessage({ type: 'error', text: data.message || 'Failed to create patient' });
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: 'An unexpected error occurred' });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleBroadcast = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setMessage(null);
+
+    try {
+      const res = await fetch("/api/notifications/broadcast", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(broadcastData)
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        setMessage({ type: 'success', text: data.message });
+        setTimeout(() => {
+          setIsBroadcastOpen(false);
+          setBroadcastData({ subject: "Clinical Update - Dr. Vikash Yadav", message: "" });
+          setMessage(null);
+        }, 3000);
+      } else {
+        setMessage({ type: 'error', text: data.message || 'Failed to send broadcast' });
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: 'An unexpected error occurred' });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const filteredPatients = useMemo(() => {
+    if (!searchQuery) return patients;
+    return patients.filter(p => 
+      p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      p.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      p.phone.includes(searchQuery)
+    );
+  }, [patients, searchQuery]);
+
   return (
     <div className="space-y-6">
-      {/* Header Section */}
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-8">
         <div>
           <h2 className="text-3xl font-manrope font-black text-primary tracking-tight capitalize">Patient Directory</h2>
-          <p className="text-on-surface-variant text-sm font-medium mt-2">Managing 1,284 patients in the Clinical Sanctuary.</p>
+          <p className="text-on-surface-variant text-sm font-medium mt-2">Managing {patients.length} formal clinical profiles.</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
           <div className="relative group">
             <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-secondary transition-colors">search</span>
             <input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-12 pr-6 py-4 bg-white border-2 border-transparent focus:border-secondary/20 w-full sm:w-80 transition-all text-sm rounded-xl outline-none shadow-sm"
               placeholder="Search patients..."
               type="text"
             />
           </div>
-          <button className="bg-primary text-white px-8 py-4 rounded-xl font-black text-[10px] capitalize tracking-widest flex items-center justify-center gap-3 shadow-xl shadow-primary/20 hover:scale-[1.02] transition-all">
-            <span className="material-symbols-outlined text-lg">person_add</span>
-            Add Patient
+          <button 
+            onClick={() => setIsBroadcastOpen(true)}
+            className="px-8 py-4 rounded-xl font-black text-[10px] capitalize tracking-widest flex items-center justify-center gap-3 border-2 border-primary/10 text-primary hover:bg-primary/5 transition-all"
+          >
+            <span className="material-symbols-outlined text-lg">campaign</span>
+            Broadcast Mail
+          </button>
+          <button 
+            onClick={() => setIsModalOpen(true)}
+            className="bg-primary text-white px-8 py-4 rounded-xl font-black text-[10px] capitalize tracking-widest flex items-center justify-center gap-3 shadow-xl shadow-primary/20 hover:scale-[1.02] transition-all"
+          >
+            <UserPlus className="w-5 h-5" />
+            Add New Patient
           </button>
         </div>
       </header>
 
-      {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {[
-          { label: "Active Today", val: "42", desc: "Scheduled appointments", icon: "trending_up", color: "text-primary bg-primary/10" },
-          { label: "Birthdays", val: "05", desc: "Patients celebrating today", icon: "cake", color: "text-secondary bg-secondary/10" },
-          { label: "Follow-ups", val: "12", desc: "Pending laboratory results", icon: "assignment_late", color: "text-error bg-error/10" },
-        ].map((stat, i) => (
-          <div key={i} className="bg-white p-8 rounded-xl border border-outline-variant/5 shadow-sm group  transition-all">
-            <div className="flex justify-between items-start mb-6">
-              <span className={`p-4 rounded-xl ${stat.color} group-hover:scale-110 transition-transform`}>
-                <span className="material-symbols-outlined">{stat.icon}</span>
-              </span>
-              <span className="text-[10px] font-black text-slate-600 capitalize tracking-widest">{stat.label}</span>
-            </div>
-            <div className="text-2xl font-manrope font-black text-primary tracking-tighter">{stat.val}</div>
-            <p className="text-[10px] font-bold text-slate-400 mt-2 capitalize tracking-widest">{stat.desc}</p>
-          </div>
-        ))}
-      </div>
-
-      {/* Patients List/Table Section */}
+      {/* Patients Table */}
       <div className="bg-white rounded-[1rem] overflow-hidden shadow-sm border border-outline-variant/10">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-slate-50/50">
                 <th className="px-10 py-8 text-sm font-black capitalize text-slate-600">Patient Profile</th>
-                <th className="px-10 py-8 text-sm font-black capitalize text-slate-600">Case ID</th>
-                <th className="px-10 py-8 text-sm font-black capitalize text-slate-600">Age / Gender</th>
-                <th className="px-10 py-8 text-sm font-black capitalize text-slate-600">Last Interaction</th>
-                <th className="px-10 py-8 text-sm font-black capitalize text-slate-600">Clinical Status</th>
+                <th className="px-10 py-8 text-sm font-black capitalize text-slate-600">Contact / Age</th>
+                <th className="px-10 py-8 text-sm font-black capitalize text-slate-600">Registered Date</th>
+                <th className="px-10 py-8 text-sm font-black capitalize text-slate-600">Origin</th>
+                <th className="px-10 py-8 text-sm font-black capitalize text-slate-600">Status</th>
                 <th className="px-10 py-8 text-sm font-black capitalize text-slate-600">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-sm">
-              {patients.map((patient, idx) => (
-                <tr key={idx} className="hover:bg-slate-50/50 transition-colors group cursor-pointer">
-                  <td className="px-10 py-8">
-                    <div className="flex items-center gap-6">
-                      <img className={`w-12 h-12 rounded-2xl ${patient.color} object-cover shadow-sm group-hover:scale-105 transition-transform`} src={patient.img} alt={patient.name} />
-                      <div>
-                        <div className="font-manrope font-black text-primary text-sm group-hover:text-secondary transition-colors capitalize tracking-tight">{patient.name}</div>
-                        <div className="text-[10px] font-bold text-slate-400 capitalize tracking-widest mt-1">{patient.email}</div>
+              {isLoading ? (
+                <tr><td colSpan={5} className="px-10 py-20 text-center text-slate-400 font-bold italic">Loading records...</td></tr>
+              ) : filteredPatients.length === 0 ? (
+                <tr><td colSpan={5} className="px-10 py-20 text-center text-slate-400 font-bold">No patient profiles found.</td></tr>
+              ) : (
+                filteredPatients.map((patient, idx) => (
+                  <tr key={patient._id} className="hover:bg-slate-50/50 transition-colors group cursor-pointer">
+                    <td className="px-10 py-8">
+                      <div className="flex items-center gap-6">
+                        <div className="w-12 h-12 rounded-2xl bg-secondary/10 flex items-center justify-center font-black text-secondary group-hover:bg-secondary group-hover:text-white transition-all uppercase">
+                          {patient.name.substring(0, 2)}
+                        </div>
+                        <div>
+                          <div className="font-manrope font-black text-primary text-sm group-hover:text-secondary transition-colors capitalize tracking-tight">{patient.name}</div>
+                          <div className="text-[10px] font-bold text-slate-400 capitalize tracking-widest mt-1">{patient.email}</div>
+                        </div>
                       </div>
-                    </div>
-                  </td>
-                  <td className="px-10 py-8 text-[11px] font-black text-slate-400 tracking-widest">{patient.id}</td>
-                  <td className="px-10 py-8 text-on-surface-variant font-medium">{patient.ageGender}</td>
-                  <td className="px-10 py-8 text-on-surface-variant font-medium">{patient.lastVisit}</td>
-                  <td className="px-10 py-8">
-                    <span className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[9px] font-black capitalize tracking-widest ${patient.status === 'Active' ? 'bg-secondary/10 text-secondary' : 'bg-slate-100 text-slate-400'}`}>
-                      <span className={`w-2 h-2 rounded-full ${patient.status === 'Active' ? 'bg-secondary animate-pulse shadow-[0_0_8px_rgba(3,192,192,0.5)]' : 'bg-slate-300'}`}></span>
-                      {patient.status}
-                    </span>
-                  </td>
-                  <td className="px-10 py-8">
-                    <button className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all shadow-sm">
-                      <span className="material-symbols-outlined text-lg">arrow_forward</span>
-                    </button>
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                    <td className="px-10 py-8">
+                      <div className="flex flex-col">
+                        <span className="text-[11px] font-black text-slate-500 tracking-widest">{patient.phone}</span>
+                        <span className="text-[10px] font-bold text-slate-400 mt-1">{patient.age ? `${patient.age} Yrs / ${patient.gender}` : 'N/A'}</span>
+                      </div>
+                    </td>
+                    <td className="px-10 py-8 text-on-surface-variant font-medium">
+                      {new Date(patient.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </td>
+                    <td className="px-10 py-8">
+                      <span className="text-[10px] font-black text-primary/60 capitalize tracking-widest bg-slate-100 px-3 py-1 rounded-lg">
+                        {patient.registeredBy || 'System'}
+                      </span>
+                    </td>
+                    <td className="px-10 py-8">
+                      <span className={cn(
+                        "inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[9px] font-black capitalize tracking-widest",
+                        patient.status === 'Active' ? 'bg-secondary/10 text-secondary' : 'bg-slate-100 text-slate-400'
+                      )}>
+                        <span className={cn("w-2 h-2 rounded-full", patient.status === 'Active' ? 'bg-secondary shadow-[0_0_8px_rgba(3,192,192,0.5)]' : 'bg-slate-300')}></span>
+                        {patient.status}
+                      </span>
+                    </td>
+                    <td className="px-10 py-8 text-right">
+                       <button className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all shadow-sm">
+                        <span className="material-symbols-outlined text-lg">visibility</span>
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
-
-        {/* Pagination Section */}
-        <div className="p-10 flex flex-col sm:flex-row items-center justify-between gap-6 border-t border-slate-100">
-          <p className="text-[10px] font-black text-slate-400 capitalize tracking-widest">Showing <span className="text-primary">1-10</span> of <span className="text-primary">1,284</span> entries</p>
-          <div className="flex gap-3">
-            <button className="w-10 h-10 flex items-center justify-center rounded-xl border-2 border-slate-50 hover:bg-slate-50 transition-colors text-slate-300">
-              <span className="material-symbols-outlined">chevron_left</span>
-            </button>
-            <button className="w-10 h-10 rounded-xl bg-primary text-white font-black text-sm shadow-lg shadow-primary/20">1</button>
-            <button className="w-10 h-10 rounded-xl hover:bg-slate-50 text-slate-400 font-black text-sm">2</button>
-            <button className="w-10 h-10 rounded-xl hover:bg-slate-50 text-slate-400 font-black text-sm">3</button>
-            <button className="w-10 h-10 flex items-center justify-center rounded-xl border-2 border-slate-50 hover:bg-slate-50 transition-colors text-slate-300">
-              <span className="material-symbols-outlined">chevron_right</span>
-            </button>
-          </div>
-        </div>
       </div>
+
+      {/* Add Patient Modal */}
+      <AnimatePresence>
+        {isModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsModalOpen(false)}
+              className="absolute inset-0 bg-primary/20 backdrop-blur-sm"
+            />
+            <motion.div 
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              className="relative w-full max-w-2xl bg-white rounded-[2.5rem] shadow-2xl overflow-hidden"
+            >
+              <div className="p-8 md:p-12">
+                <div className="flex justify-between items-start mb-10">
+                  <div className="space-y-2">
+                    <h3 className="text-3xl font-manrope font-black text-primary tracking-tight">Register New Patient</h3>
+                    <p className="text-sm font-medium text-slate-400">Add a new clinical record to the sanctuary database.</p>
+                  </div>
+                  <button onClick={() => setIsModalOpen(false)} className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 hover:bg-error hover:text-white transition-all group">
+                    <X className="w-6 h-6 group-hover:rotate-90 transition-transform" />
+                  </button>
+                </div>
+
+                <form onSubmit={handleCreatePatient} className="space-y-8">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-slate-600 capitalize ml-1">Full Name</label>
+                      <input 
+                        required
+                        className="w-full px-6 py-4 bg-slate-50 border-2 border-transparent focus:border-secondary/20 focus:bg-white rounded-2xl text-sm font-bold text-primary outline-none transition-all shadow-inner"
+                        placeholder="e.g. Rahul Verma"
+                        value={formData.name}
+                        onChange={(e) => setFormData({...formData, name: e.target.value})}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-slate-600 capitalize ml-1">Official Email</label>
+                      <input 
+                        required
+                        type="email"
+                        className="w-full px-6 py-4 bg-slate-50 border-2 border-transparent focus:border-secondary/20 focus:bg-white rounded-2xl text-sm font-bold text-primary outline-none transition-all shadow-inner"
+                        placeholder="rahul@example.com"
+                        value={formData.email}
+                        onChange={(e) => setFormData({...formData, email: e.target.value})}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-slate-600 capitalize ml-1">Phone Number</label>
+                      <input 
+                        required
+                        className="w-full px-6 py-4 bg-slate-50 border-2 border-transparent focus:border-secondary/20 focus:bg-white rounded-2xl text-sm font-bold text-primary outline-none transition-all shadow-inner"
+                        placeholder="+91..."
+                        value={formData.phone}
+                        onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-slate-600 capitalize ml-1">Patient Age</label>
+                      <input 
+                        type="number"
+                        className="w-full px-6 py-4 bg-slate-50 border-2 border-transparent focus:border-secondary/20 focus:bg-white rounded-2xl text-sm font-bold text-primary outline-none transition-all shadow-inner"
+                        placeholder="Age"
+                        value={formData.age}
+                        onChange={(e) => setFormData({...formData, age: e.target.value})}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-slate-600 capitalize ml-1">Gender</label>
+                      <select 
+                        className="w-full px-6 py-4 bg-slate-50 border-2 border-transparent focus:border-secondary/20 focus:bg-white rounded-2xl text-sm font-black text-primary outline-none transition-all shadow-inner appearance-none cursor-pointer"
+                        value={formData.gender}
+                        onChange={(e) => setFormData({...formData, gender: e.target.value})}
+                      >
+                        <option>Male</option>
+                        <option>Female</option>
+                        <option>Other</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {message && (
+                    <motion.div 
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className={cn(
+                        "p-4 rounded-xl text-xs font-black capitalize tracking-widest flex items-center gap-3",
+                        message.type === 'success' ? 'bg-secondary/10 text-secondary' : 'bg-error/10 text-error'
+                      )}
+                    >
+                      {message.type === 'success' ? <CheckCircle2 className="w-4 h-4" /> : null}
+                      {message.text}
+                    </motion.div>
+                  )}
+
+                  <button 
+                    disabled={isSubmitting}
+                    className="w-full py-6 bg-primary text-white rounded-[1.5rem] font-black text-[10px] capitalize tracking-[0.2em] shadow-2xl shadow-primary/20 hover:scale-[1.01] active:scale-95 transition-all flex items-center justify-center gap-3"
+                  >
+                    {isSubmitting ? (
+                      <Loader2 className="w-5 h-5 animate-spin text-white" />
+                    ) : 'Register Patient Certificate'}
+                  </button>
+                </form>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Broadcast Modal */}
+      <AnimatePresence>
+        {isBroadcastOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsBroadcastOpen(false)}
+              className="absolute inset-0 bg-primary/20 backdrop-blur-sm"
+            />
+            <motion.div 
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              className="relative w-full max-w-2xl bg-white rounded-[2.5rem] shadow-2xl overflow-hidden"
+            >
+              <div className="p-8 md:p-12">
+                <div className="flex justify-between items-start mb-10">
+                  <div className="space-y-2">
+                    <h3 className="text-3xl font-manrope font-black text-primary tracking-tight">Broadcast Outreach</h3>
+                    <p className="text-sm font-medium text-slate-400">Send a priority email notification to all active patient records.</p>
+                  </div>
+                  <button onClick={() => setIsBroadcastOpen(false)} className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 hover:bg-error hover:text-white transition-all group">
+                    <X className="w-6 h-6 group-hover:rotate-90 transition-transform" />
+                  </button>
+                </div>
+
+                <form onSubmit={handleBroadcast} className="space-y-8">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-slate-600 capitalize ml-1">Email Subject</label>
+                    <input 
+                      required
+                      className="w-full px-6 py-4 bg-slate-50 border-2 border-transparent focus:border-secondary/20 focus:bg-white rounded-2xl text-sm font-bold text-primary outline-none transition-all shadow-inner"
+                      placeholder="e.g. Schedule Change or Health Alert"
+                      value={broadcastData.subject}
+                      onChange={(e) => setBroadcastData({...broadcastData, subject: e.target.value})}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-slate-600 capitalize ml-1">Outreach Message</label>
+                    <textarea 
+                      required
+                      className="w-full bg-slate-50 border-2 border-transparent focus:border-secondary/20 focus:bg-white rounded-[2rem] px-6 py-6 text-sm font-medium text-slate-600 outline-none transition-all shadow-inner resize-none min-h-[200px]"
+                      placeholder="Type your clinical update here..."
+                      value={broadcastData.message}
+                      onChange={(e) => setBroadcastData({...broadcastData, message: e.target.value})}
+                    />
+                  </div>
+
+                  {message && (
+                    <motion.div 
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className={cn(
+                        "p-4 rounded-xl text-xs font-black capitalize tracking-widest flex items-center gap-3 border-2",
+                        message.type === 'success' ? 'bg-secondary/10 text-secondary border-secondary/20' : 'bg-error/10 text-error border-error/20'
+                      )}
+                    >
+                      {message.type === 'success' ? <CheckCircle2 className="w-4 h-4" /> : null}
+                      {message.text}
+                    </motion.div>
+                  )}
+
+                  <button 
+                    disabled={isSubmitting}
+                    className="w-full py-6 bg-secondary text-white rounded-[1.5rem] font-black text-[10px] capitalize tracking-[0.2em] shadow-2xl shadow-secondary/20 hover:scale-[1.01] active:scale-95 transition-all flex items-center justify-center gap-3"
+                  >
+                    {isSubmitting ? (
+                      <Loader2 className="w-5 h-5 animate-spin text-white" />
+                    ) : (
+                      <>
+                        <span className="material-symbols-outlined text-lg">send</span>
+                        Dispatch Broadcast Email
+                      </>
+                    )}
+                  </button>
+                </form>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

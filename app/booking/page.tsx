@@ -2,16 +2,26 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Link from "next/link";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
+
+// Deterministic date formatter — avoids cross-browser locale inconsistencies
+const formatDate = (date: Date): string => {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+};
 
 export default function Booking() {
   const today = new Date();
   const [selectedService, setSelectedService] = useState("Follow-up");
   const [selectedDate, setSelectedDate] = useState(new Date(today.getFullYear(), today.getMonth(), today.getDate()));
-  const [selectedTime, setSelectedTime] = useState("11:15 AM");
+  const [selectedTime, setSelectedTime] = useState("");
   const [viewDate, setViewDate] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
+  const [occupiedSlots, setOccupiedSlots] = useState<string[]>([]);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const services = [
     { id: "Consultation", title: "Consultation", icon: "medical_information", desc: "General assessment and expert health strategy." },
@@ -19,15 +29,28 @@ export default function Booking() {
     { id: "Diagnostic", title: "Diagnostic", icon: "biotech", desc: "In-depth clinical analysis and specialized tests." },
   ];
 
-  // Define some slots as "booked" for realism
-  const timeSlots = [
-    { time: "09:00 AM", available: true },
-    { time: "10:30 AM", available: false },
-    { time: "11:15 AM", available: true },
-    { time: "01:00 PM", available: true },
-    { time: "02:30 PM", available: false },
-    { time: "04:00 PM", available: true },
+  const baseTimeSlots = [
+    "09:00 AM", "10:00 AM", "11:00 AM", "12:00 PM",
+    "02:00 PM", "03:00 PM", "04:00 PM", "05:00 PM"
   ];
+
+  // Fetch occupied slots whenever the date changes
+  useEffect(() => {
+    const fetchOccupied = async () => {
+      const formattedDate = formatDate(selectedDate);
+      try {
+        const res = await fetch(`/api/bookings?date=${formattedDate}`);
+        const data = await res.json();
+        if (data.success) {
+          setOccupiedSlots(data.data.map((b: any) => b.time));
+        }
+      } catch (err) {
+        console.error("Failed to fetch slots");
+      }
+    };
+    fetchOccupied();
+    setSelectedTime(""); // Reset time on date change
+  }, [selectedDate]);
 
   // Calendar Helpers
   const daysInMonth = (year: number, month: number) => new Date(year, month + 1, 0).getDate();
@@ -41,11 +64,9 @@ export default function Booking() {
     const prevMonthTotalDays = daysInMonth(year, month - 1);
 
     const days = [];
-    // Padding from previous month
     for (let i = startDay - 1; i >= 0; i--) {
       days.push({ day: prevMonthTotalDays - i, currentMonth: false });
     }
-    // Days of current month
     for (let i = 1; i <= totalDays; i++) {
       days.push({ day: i, currentMonth: true });
     }
@@ -56,6 +77,55 @@ export default function Booking() {
   const prevMonth = () => setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() - 1, 1));
 
   const monthName = viewDate.toLocaleString('default', { month: 'long' });
+
+  const [formData, setFormData] = useState({
+    name: "",
+    phone: "",
+    email: "",
+    message: "",
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedTime) {
+      setErrorMessage("Please select an available time slot.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setErrorMessage("");
+
+    try {
+      const res = await fetch("/api/bookings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...formData,
+          service: selectedService,
+          date: formatDate(selectedDate),
+          time: selectedTime,
+        }),
+      });
+      const data = await res.json();
+        if (data.success) {
+        setIsSuccess(true);
+        setFormData({ name: "", phone: "", email: "", message: "" });
+        // Refresh occupied slots
+        setOccupiedSlots([...occupiedSlots, selectedTime]);
+      } else {
+        // Show the REAL server error, not a misleading generic message
+        const errMsg = data.message || data.error || "Booking failed. Please try again.";
+        console.error('[Booking] Server returned error:', data);
+        setErrorMessage(errMsg);
+      }
+    } catch (error) {
+      setErrorMessage("Something went wrong. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <main className="bg-surface font-inter text-on-surface antialiased">
@@ -172,29 +242,49 @@ export default function Booking() {
                   <span className="w-10 h-10 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-manrope font-bold text-lg">3</span>
                   <h2 className="font-manrope text-2xl font-black text-primary capitalize tracking-tight">Available Slots</h2>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  {timeSlots.map((slot) => (
-                    <button
-                      key={slot.time}
-                      disabled={!slot.available}
-                      onClick={() => setSelectedTime(slot.time)}
-                      className={cn(
-                        "py-4 px-4 rounded-xl border transition-all font-manrope font-black text-xs relative overflow-hidden",
-                        selectedTime === slot.time && slot.available
-                          ? "bg-secondary text-white border-secondary shadow-lg shadow-secondary/20 scale-[1.02]"
-                          : slot.available
-                            ? "bg-white border-slate-100 text-primary hover:border-secondary/30"
-                            : "bg-slate-50 border-slate-100 text-slate-300 cursor-not-allowed"
-                      )}
+                
+                {/* Error Message Display */}
+                <AnimatePresence>
+                  {errorMessage && (
+                    <motion.div 
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="bg-red-50 text-red-600 p-4 rounded-xl text-xs font-bold border border-red-100 mb-4 flex items-center gap-2"
                     >
-                      {slot.time}
-                      {!slot.available && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-white/20 border border-red-600">
-                          <span className="text-[10px] font-black text-red-600">BOOKED</span>
-                        </div>
-                      )}
-                    </button>
-                  ))}
+                      <span className="material-symbols-outlined text-sm">error</span>
+                      {errorMessage}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                <div className="grid grid-cols-2 gap-4">
+                  {baseTimeSlots.map((time) => {
+                    const isOccupied = occupiedSlots.includes(time);
+                    return (
+                      <button
+                        type="button"
+                        key={time}
+                        disabled={isOccupied}
+                        onClick={() => setSelectedTime(time)}
+                        className={cn(
+                          "py-4 px-4 rounded-xl border transition-all font-manrope font-black text-xs relative overflow-hidden",
+                          selectedTime === time && !isOccupied
+                            ? "bg-secondary text-white border-secondary shadow-lg shadow-secondary/20 scale-[1.02]"
+                            : !isOccupied
+                              ? "bg-white border-slate-100 text-primary hover:border-secondary/30"
+                              : "bg-slate-50 border-slate-100 text-slate-300 cursor-not-allowed"
+                        )}
+                      >
+                        {time}
+                        {isOccupied && (
+                          <div className="absolute inset-0 flex items-center justify-center bg-white/40 backdrop-blur-[1px]">
+                            <span className="text-[10px] font-black text-red-600 bg-white/90 px-2 py-1 rounded-md border border-red-100">BOOKED</span>
+                          </div>
+                        )}
+                      </button>
+                    );
+                  })}
                 </div>
                 <div className="mt-8 flex items-center gap-3 text-slate-500 text-sm font-black bg-slate-50 p-6 rounded-xl border border-slate-100">
                   <span className="material-symbols-outlined text-secondary text-lg">info</span>
@@ -209,24 +299,51 @@ export default function Booking() {
                 <span className="w-10 h-10 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-manrope font-bold text-lg">4</span>
                 <h2 className="font-manrope text-2xl font-black text-primary capitalize tracking-tight">Patient Information</h2>
               </div>
-              <form className="space-y-8 bg-white p-10 rounded-[1rem] shadow-xl shadow-blue-900/5 border border-slate-50">
+              <form id="booking-form" onSubmit={handleSubmit} className="space-y-8 bg-white p-10 rounded-[1rem] shadow-xl shadow-blue-900/5 border border-slate-50">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div className="space-y-2">
                     <label className="block text-sm font-black text-slate-600">Full Name</label>
-                    <input className="w-full bg-slate-50 border-2 border-transparent focus:border-secondary focus:bg-white rounded-xl px-6 py-4 transition-all outline-none font-medium text-sm" placeholder="John Doe" type="text" />
+                    <input 
+                      required
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      className="w-full bg-slate-50 border-2 border-transparent focus:border-secondary focus:bg-white rounded-xl px-6 py-4 transition-all outline-none font-medium text-sm" 
+                      placeholder="John Doe" 
+                      type="text" 
+                    />
                   </div>
                   <div className="space-y-2">
                     <label className="block text-sm font-black text-slate-600">Phone Number</label>
-                    <input className="w-full bg-slate-50 border-2 border-transparent focus:border-secondary focus:bg-white rounded-xl px-6 py-4 transition-all outline-none font-medium text-sm" placeholder="+91 999 000 0000" type="tel" />
+                    <input 
+                      required
+                      value={formData.phone}
+                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                      className="w-full bg-slate-50 border-2 border-transparent focus:border-secondary focus:bg-white rounded-xl px-6 py-4 transition-all outline-none font-medium text-sm" 
+                      placeholder="+91 870 825 5349" 
+                      type="tel" 
+                    />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <label className="block text-sm font-black text-slate-600">Email Address</label>
-                  <input className="w-full bg-slate-50 border-2 border-transparent focus:border-secondary focus:bg-white rounded-xl px-6 py-4 transition-all outline-none font-medium text-sm" placeholder="john.doe@email.com" type="email" />
+                  <input 
+                    required
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    className="w-full bg-slate-50 border-2 border-transparent focus:border-secondary focus:bg-white rounded-xl px-6 py-4 transition-all outline-none font-medium text-sm" 
+                    placeholder="john.doe@email.com" 
+                    type="email" 
+                  />
                 </div>
                 <div className="space-y-2">
                   <label className="block text-sm font-black text-slate-600">Reason for Visit</label>
-                  <textarea className="w-full bg-slate-50 border-2 border-transparent focus:border-secondary focus:bg-white rounded-xl px-6 py-4 transition-all outline-none font-medium text-sm min-h-[120px]" placeholder="Briefly describe your symptoms or concern..." rows={3}></textarea>
+                  <textarea 
+                    value={formData.message}
+                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                    className="w-full bg-slate-50 border-2 border-transparent focus:border-secondary focus:bg-white rounded-xl px-6 py-4 transition-all outline-none font-medium text-sm min-h-[120px]" 
+                    placeholder="Briefly describe your symptoms or concern..." 
+                    rows={3}
+                  ></textarea>
                 </div>
               </form>
             </section>
@@ -266,7 +383,7 @@ export default function Booking() {
                   <div className="flex justify-between items-center">
                     <span className="text-sm font-bold text-slate-600">Scheduled Date</span>
                     <span className="font-manrope font-bold text-primary text-sm">
-                      {selectedDate.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })}
+                      {selectedDate.toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' })}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
@@ -278,10 +395,22 @@ export default function Booking() {
                     <span className="font-manrope font-bold text-secondary text-xl">₹1,200.00</span>
                   </div>
                 </div>
-                <button className="w-full bg-primary hover:bg-blue-800 text-white py-5 rounded-[1.5rem] font-manrope font-bold text-lg transition-all shadow-2xl shadow-primary/20 flex items-center justify-center gap-3 active:scale-95">
-                  Confirm Booking
-                  <span className="material-symbols-outlined text-white">check_circle</span>
-                </button>
+
+                {isSuccess ? (
+                  <div className="bg-green-50 text-green-700 p-4 rounded-xl text-center font-bold text-sm border border-green-100 animate-pulse">
+                    Booking Confirmed! We will contact you soon.
+                  </div>
+                ) : (
+                  <button 
+                    form="booking-form"
+                    disabled={isSubmitting}
+                    type="submit"
+                    className="w-full bg-primary hover:bg-blue-800 disabled:bg-slate-400 text-white py-5 rounded-[1.5rem] font-manrope font-bold text-lg transition-all shadow-2xl shadow-primary/20 flex items-center justify-center gap-3 active:scale-95"
+                  >
+                    {isSubmitting ? "Processing..." : "Confirm Booking"}
+                    <span className="material-symbols-outlined text-white">check_circle</span>
+                  </button>
+                )}
                 <p className="text-[12px] text-center text-slate-600 leading-relaxed font-bold">
                   Patient privacy as per clinical standards. <br />Cancellations available 24h prior.
                 </p>

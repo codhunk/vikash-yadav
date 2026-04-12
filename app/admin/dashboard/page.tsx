@@ -1,6 +1,52 @@
+"use client";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
+
+interface Booking {
+  _id: string;
+  name: string;
+  email: string;
+  phone: string;
+  date: string;
+  time: string;
+  service: string;
+  status: string;
+  createdAt: string;
+}
 
 export default function AdminDashboard() {
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    fetchBookings();
+  }, []);
+
+  const fetchBookings = async () => {
+    try {
+      const res = await fetch("/api/bookings");
+      const data = await res.json();
+      if (data.success) {
+        setBookings(data.data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch bookings:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const stats = {
+    total: bookings.length,
+    new: bookings.filter(b => {
+      const createdDate = new Date(b.createdAt);
+      const today = new Date();
+      return createdDate.toDateString() === today.toDateString();
+    }).length,
+    pending: bookings.filter(b => b.status === 'pending').length
+  };
+
   return (
     <div className="space-y-8">
       {/* Header Inside Dashboard */}
@@ -29,10 +75,10 @@ export default function AdminDashboard() {
             <div className="p-4 bg-primary/10 text-primary rounded-2xl group-hover:bg-primary group-hover:text-white transition-all">
               <span className="material-symbols-outlined">event_available</span>
             </div>
-            <span className="text-secondary font-bold text-[10px] capitalize bg-secondary/10 px-3 py-1 rounded-full">Today</span>
+            <span className="text-secondary font-bold text-[10px] capitalize bg-secondary/10 px-3 py-1 rounded-full">Lifetime</span>
           </div>
           <h3 className="text-on-surface-variant text-xs font-bold capitalize mb-1">Total Appointments</h3>
-          <p className="text-3xl font-manrope font-black text-primary ">12</p>
+          <p className="text-3xl font-manrope font-black text-primary ">{stats.total}</p>
         </div>
 
         <div className="bg-surface-container-lowest p-8 rounded-[1rem] shadow-sm border border-outline-variant/5 group hover:shadow-xl transition-all">
@@ -40,10 +86,10 @@ export default function AdminDashboard() {
             <div className="p-4 bg-secondary/10 text-secondary rounded-2xl group-hover:bg-secondary group-hover:text-white transition-all">
               <span className="material-symbols-outlined">person_add</span>
             </div>
-            <span className="text-secondary font-bold text-[10px] capitalize bg-secondary/10 px-3 py-1 rounded-full">+14%</span>
+            <span className="text-secondary font-bold text-[10px] capitalize bg-secondary/10 px-3 py-1 rounded-full">Today</span>
           </div>
-          <h3 className="text-on-surface-variant text-xs font-bold capitalize mb-1">New Patients</h3>
-          <p className="text-3xl font-manrope font-black text-primary ">28</p>
+          <h3 className="text-on-surface-variant text-xs font-bold capitalize mb-1">New Bookings</h3>
+          <p className="text-3xl font-manrope font-black text-primary ">{stats.new}</p>
         </div>
 
         <div className="bg-surface-container-lowest p-8 rounded-[1rem] shadow-sm border border-outline-variant/5 group hover:shadow-xl transition-all">
@@ -53,8 +99,8 @@ export default function AdminDashboard() {
             </div>
             <span className="text-error font-bold text-[10px] capitalize bg-error/10 px-3 py-1 rounded-full">Urgent</span>
           </div>
-          <h3 className="text-on-surface-variant text-xs font-bold capitalize mb-1">Pending Surgery</h3>
-          <p className="text-3xl font-manrope font-black text-primary ">05</p>
+          <h3 className="text-on-surface-variant text-xs font-bold capitalize mb-1">Pending Requests</h3>
+          <p className="text-3xl font-manrope font-black text-primary ">{stats.pending}</p>
         </div>
       </section>
 
@@ -64,38 +110,50 @@ export default function AdminDashboard() {
           <section>
             <div className="flex items-center justify-between mb-8">
               <h3 className="text-xl font-manrope font-black text-primary capitalize">Upcoming Appointments</h3>
-              <button className="text-[10px] font-bold text-secondary capitalize hover:text-primary transition-colors">View All Calendar</button>
+              <button 
+                onClick={fetchBookings}
+                className="text-[10px] font-bold text-secondary capitalize hover:text-primary transition-colors flex items-center gap-1"
+              >
+                <span className="material-symbols-outlined text-[14px]">refresh</span> Refresh
+              </button>
             </div>
             <div className="space-y-4">
-              {[
-                { name: "Arjun Mehta", time: "09:30 AM", type: "Consultation", tag: "General Checkup", initial: "AM" },
-                { name: "Sanya Kapoor", time: "11:00 AM", type: "Follow-up", tag: "Post-Surgery", initial: "SK" },
-                { name: "Rohan Verma", time: "02:30 PM", type: "New Patient", tag: "Diagnostics", initial: "RV" },
-              ].map((apt, i) => (
-                <div key={i} className="group bg-white p-6 rounded-3xl flex items-center justify-between transition-all border border-transparent">
-                  <div className="flex items-center gap-6">
-                    <div className="w-14 h-14 rounded-2xl bg-slate-50 flex items-center justify-center font-black text-primary font-manrope text-lg group-hover:bg-primary group-hover:text-white transition-all">
-                      {apt.initial}
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-on-surface text-sm">{apt.name}</h4>
-                      <div className="flex items-center gap-3 mt-1">
-                        <span className="text-[10px] font-bold text-secondary capitalize flex items-center gap-1">
-                          <span className="material-symbols-outlined text-[14px]">schedule</span> {apt.time}
-                        </span>
-                        <span className="w-1 h-1 bg-slate-200 rounded-full"></span>
-                        <span className="text-[10px] font-bold text-slate-400 capitalize">{apt.type}</span>
+              {isLoading ? (
+                <p className="text-center py-10 text-slate-400 font-bold">Loading appointments...</p>
+              ) : bookings.length === 0 ? (
+                <p className="text-center py-10 text-slate-400 font-bold">No appointments found.</p>
+              ) : (
+                bookings.map((apt) => (
+                  <div key={apt._id} className="group bg-white p-6 rounded-3xl flex items-center justify-between transition-all border border-transparent hover:border-slate-100 hover:shadow-md">
+                    <div className="flex items-center gap-6">
+                      <div className="w-14 h-14 rounded-2xl bg-slate-50 flex items-center justify-center font-black text-primary font-manrope text-lg group-hover:bg-primary group-hover:text-white transition-all uppercase">
+                        {apt.name.substring(0, 2)}
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-on-surface text-sm">{apt.name}</h4>
+                        <div className="flex items-center gap-3 mt-1">
+                          <span className="text-[10px] font-bold text-secondary capitalize flex items-center gap-1">
+                            <span className="material-symbols-outlined text-[14px]">schedule</span> {apt.date} at {apt.time}
+                          </span>
+                          <span className="w-1 h-1 bg-slate-200 rounded-full"></span>
+                          <span className="text-[10px] font-bold text-slate-400 capitalize">{apt.service}</span>
+                        </div>
                       </div>
                     </div>
+                    <div className="flex items-center gap-4">
+                      <span className={cn(
+                        "hidden sm:inline-block px-4 py-2 text-[10px] font-black rounded-xl capitalize border",
+                        apt.status === 'confirmed' ? "bg-green-50 text-green-600 border-green-100" : "bg-slate-50 text-slate-500 border-slate-100"
+                      )}>
+                        {apt.status}
+                      </span>
+                      <button className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all">
+                        <span className="material-symbols-outlined">expand_content</span>
+                      </button>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-4">
-                    <span className="hidden sm:inline-block px-4 py-2 bg-slate-50 text-[10px] font-black rounded-xl text-slate-500 capitalize border border-slate-100">{apt.tag}</span>
-                    <button className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all">
-                      <span className="material-symbols-outlined">expand_content</span>
-                    </button>
-                  </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </section>
 
@@ -104,7 +162,7 @@ export default function AdminDashboard() {
               <h3 className="text-xl font-manrope font-black text-primary capitalize">Clinical Quick Actions</h3>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <button className="flex items-center gap-6 p-4 bg-white rounded-[2rem] transition-all border border-slate-50 group text-left">
+              <Link href="/booking" className="flex items-center gap-6 p-4 bg-white rounded-[2rem] transition-all border border-slate-50 group text-left">
                 <div className="w-16 h-16 rounded-[1.5rem] bg-secondary/10 text-secondary flex items-center justify-center group-hover:bg-secondary group-hover:text-white transition-all">
                   <span className="material-symbols-outlined text-3xl font-light">add_circle</span>
                 </div>
@@ -112,7 +170,7 @@ export default function AdminDashboard() {
                   <p className="font-manrope font-black text-primary capitalize text-sm">New Appointment</p>
                   <p className="text-[10px] text-slate-400 font-bold capitalize mt-1">Schedule patient visit</p>
                 </div>
-              </button>
+              </Link>
               <button className="flex items-center gap-6 p-4 bg-white rounded-[2rem] transition-all border border-slate-50 group text-left">
                 <div className="w-16 h-16 rounded-[1.5rem] bg-primary/10 text-primary flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all">
                   <span className="material-symbols-outlined text-3xl font-light">edit_calendar</span>
@@ -134,18 +192,17 @@ export default function AdminDashboard() {
               <button className="text-[10px] font-bold text-secondary capitalize hover:text-primary transition-colors">Directory</button>
             </div>
             <div className="grid grid-cols-1 gap-4">
-              {[
-                { name: "Meera Gupta", added: "2 hrs ago", img: "https://lh3.googleusercontent.com/aida-public/AB6AXuAL1RqTTdV0VS6NN7xHyPAZG_7_qJASQqoASE6JWFDkTiKECnnLDteWrZEy6wfrDl7tOTALrtGfcs6JC-gd4__EN2Qq1HeeowF3WPJ-omr01Ebjb06KfiSp4-_m71FhDVnI1ZKlogoBuAblO_U5rCytSk0dOdhD1Ju99LVsTXDTFsRoibXc_tJEcid39uW-K5og60PGo1U3u-xKfPX8n1x_6ZO2LTBQof5HVHUkjUW9bOK4JKQDDBJZ6oelphBkQkcMnx22-lzgHA" },
-                { name: "Vikram Sethi", added: "5 hrs ago", img: "https://lh3.googleusercontent.com/aida-public/AB6AXuCHNHv1wBUd6xgf9gJg9ZLFrD3M_eA4zkmdERKY7ZUQSR7WNNwOsRigj1sf4XxqA-OJ7H6kEwacdEYlnhj1gOMOf4IU3dnrGPHxlZ1bU0e8u1MAUoButYweGkXFUIF63pObgJcv3zOaPEiUFUDha5M_IUIUR91QPMGVil_OD-mXCCkb0uBWcdPKHV8TADnVXRtRCl4J3-lN6qJJtMNsS54LGya-zynr3idzp7odz_5Q6cyg4Lo_Bbs8LZvt_lxGC3LATZNXWMPZGQ" },
-              ].map((patient, i) => (
-                <div key={i} className="bg-white p-5 rounded-3xl shadow-sm border border-slate-50 flex items-center gap-4 group hover:shadow-sm transition-all">
-                  <img alt="Patient Avatar" className="w-14 h-14 rounded-2xl object-cover transition-all" src={patient.img} />
-                  <div className="flex-1">
-                    <h4 className="font-bold text-primary text-sm">{patient.name}</h4>
-                    <p className="text-[9px] text-slate-400 font-bold capitalize mt-1">Added {patient.added}</p>
+              {bookings.slice(0, 3).map((apt) => (
+                <div key={apt._id} className="bg-white p-5 rounded-3xl shadow-sm border border-slate-50 flex items-center gap-4 group hover:shadow-sm transition-all text-xs">
+                  <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center font-bold text-primary uppercase">
+                    {apt.name[0]}
                   </div>
-                  <button className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
-                    <span className="material-symbols-outlined text-xl">arrow_forward</span>
+                  <div className="flex-1">
+                    <h4 className="font-bold text-primary text-sm">{apt.name}</h4>
+                    <p className="text-[9px] text-slate-400 font-bold capitalize mt-1">{apt.phone}</p>
+                  </div>
+                  <button className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
+                    <span className="material-symbols-outlined text-lg">arrow_forward</span>
                   </button>
                 </div>
               ))}
@@ -160,7 +217,7 @@ export default function AdminDashboard() {
                 <div className="w-3 h-3 bg-secondary rounded-full"></div>
                 <div className="absolute inset-0 w-3 h-3 bg-secondary rounded-full animate-ping opacity-75"></div>
               </div>
-              <span className="text-sm font-black text-primary capitalize">3 Active Consultations</span>
+              <span className="text-sm font-black text-primary capitalize">{bookings.length} Registered Bookings</span>
             </div>
             <div className="space-y-4">
               <div className="h-2 w-full bg-slate-200 rounded-full overflow-hidden">
