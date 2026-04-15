@@ -378,16 +378,16 @@ export default function ExpertisePage() {
               </div>
             </div>
             <div className="lg:w-1/2 relative">
-              <div className="bg-white/70 backdrop-blur-md p-4 md:p-12 rounded-[1rem] shadow-3xl shadow-slate-200/50 relative z-10 border border-white">
+              <div className="bg-white/70 backdrop-blur-md p-6 md:p-10 rounded-[1rem] shadow-3xl shadow-slate-200/50 relative z-10 border border-white">
                 <span className="text-[11rem] font-black text-slate-100/30 absolute right-10 top-0 select-none -z-0">MS</span>
                 <div className="relative z-10 space-y-8">
                   <div className="space-y-3">
-                    <div className="inline-block px-3 py-1 bg-secondary/10 rounded-lg text-[10px] font-black text-secondary uppercase mb-2">Education Track</div>
+                    <div className="inline-block px-6 py-2 bg-secondary/10 rounded-lg text-[10px] font-black text-secondary uppercase mb-2">Education Track</div>
                     <h4 className="text-2xl md:text-2xl font-black text-primary uppercase">MBBS & MS Surgery</h4>
                     <p className="text-sm font-bold text-slate-400 captilize leading-relaxed">Post Graduate Institute of Medical Sciences, Rohtak | Maharaja Agrasen Medical College</p>
                   </div>
                   <div className="space-y-3">
-                    <div className="inline-block px-3 py-1 bg-primary/10 rounded-lg text-[10px] font-black text-primary uppercase mb-2">Specialized Training</div>
+                    <div className="inline-block px-6 py-2 bg-primary/10 rounded-lg text-[10px] font-black text-primary uppercase mb-2">Specialized Training</div>
                     <h4 className="text-2xl md:text-2xl font-black text-primary uppercase">FNB Minimal Access</h4>
                     <p className="text-sm font-bold text-slate-400 captilize leading-relaxed">Fellowship from Max Super Speciality Hospital, Saket, New Delhi</p>
                   </div>
