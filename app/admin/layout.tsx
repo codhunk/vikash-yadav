@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { LayoutDashboard, Calendar, Users, Settings, LogOut, HeartPulse, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -11,7 +11,21 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  const handleLogout = async () => {
+    try {
+      const res = await fetch("/api/auth/logout", {
+        method: "POST",
+      });
+      if (res.ok) {
+        router.push("/login");
+      }
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
 
   const menuItems = [
     { name: "Dashboard", icon: LayoutDashboard, href: "/admin/dashboard" },
@@ -85,7 +99,10 @@ export default function AdminLayout({
         </nav>
 
         <div className="pt-8 border-t border-white/10 mt-6 pb-2">
-          <button className="flex items-center gap-4 px-6 py-4 rounded-xl font-inter text-xs font-black capitalize text-blue-100/40 hover:bg-error/10 hover:text-error transition-all w-full text-left group">
+          <button 
+            onClick={handleLogout}
+            className="flex items-center gap-4 px-6 py-4 rounded-xl font-inter text-xs font-black capitalize text-blue-100/40 hover:bg-error/10 hover:text-error transition-all w-full text-left group"
+          >
             <LogOut className="w-5 h-5 group-hover:text-error transition-transform group-hover:-translate-x-1" />
             Sign Out
           </button>
