@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import connectDB from '@/server/mongodb';
 import Booking from '@/server/models/Booking';
 import { sendBookingConfirmation } from '@/server/lib/notifications';
-
+//hi commeny
 export async function GET(
   req: Request,
   context: { params: Promise<{ id: string }> }
