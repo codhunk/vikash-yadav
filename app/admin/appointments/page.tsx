@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { X, CheckCircle2, Phone, Mail, Clock, Calendar as CalIcon, User } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface Booking {
   _id: string;
@@ -21,6 +23,8 @@ export default function AdminAppointments() {
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("All Status");
+  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     fetchBookings();
@@ -50,10 +54,22 @@ export default function AdminAppointments() {
       const data = await res.json();
       if (data.success) {
         fetchBookings(); // Refresh the list
+        if (selectedBooking?._id === id) {
+          setSelectedBooking({ ...selectedBooking, status: newStatus });
+        }
       }
     } catch (error) {
       console.error("Failed to update status:", error);
     }
+  };
+
+  const openBookingDetails = (booking: Booking) => {
+    setSelectedBooking(booking);
+    setIsModalOpen(true);
+  };
+
+  const handlePrint = () => {
+    window.print();
   };
 
   const daysInMonth = (month: number, year: number) => new Date(year, month + 1, 0).getDate();
@@ -140,6 +156,7 @@ export default function AdminAppointments() {
                   <option>Confirmed</option>
                   <option>Pending</option>
                   <option>Cancelled</option>
+                  <option>Completed</option>
                 </select>
               </div>
             </div>
@@ -206,12 +223,37 @@ export default function AdminAppointments() {
 
         <div className="lg:col-span-4 h-full">
           <div className="bg-white rounded-[1rem] p-6 h-full flex flex-col shadow-sm border border-outline-variant/10">
-            <div className="flex items-center justify-between mb-10">
+            <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
                 <div className="w-2 h-2 rounded-full bg-secondary animate-pulse shadow-[0_0_10px_rgba(3,192,192,0.5)]"></div>
                 <h3 className="text-lg font-manrope font-black text-primary capitalize tracking-tight">Schedule for {selectedDateStr}</h3>
               </div>
             </div>
+
+            {/* Next Patient Highlight */}
+            {!isLoading && dailySchedule.some(b => b.status === 'confirmed') && (
+              <div className="mb-8 p-6 bg-primary text-white rounded-[1.5rem] shadow-xl shadow-primary/20 relative overflow-hidden group">
+                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
+                  <span className="material-symbols-outlined text-6xl">person_play</span>
+                </div>
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] opacity-80 mb-2 block">Next Patient Up</span>
+                {(() => {
+                  const nextPatient = dailySchedule.find(b => b.status === 'confirmed');
+                  return (
+                    <>
+                      <h4 className="text-xl font-black font-manrope mb-1">{nextPatient?.name}</h4>
+                      <p className="text-xs font-bold opacity-80 mb-4">{nextPatient?.time} - {nextPatient?.service}</p>
+                      <button 
+                        onClick={() => handleStatusUpdate(nextPatient!._id, 'completed')}
+                        className="bg-white text-primary px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-secondary hover:text-white transition-all shadow-lg"
+                      >
+                        Mark as Completed
+                      </button>
+                    </>
+                  );
+                })()}
+              </div>
+            )}
 
             <div className="space-y-6 flex-grow overflow-y-auto pr-2 custom-scrollbar">
               {isLoading ? (
@@ -233,15 +275,43 @@ export default function AdminAppointments() {
                         <span className={cn(
                           "px-3 py-1 rounded-full text-[9px] font-black capitalize tracking-widest",
                           appt.status === 'cancelled' ? 'bg-error/10 text-error' :
-                          appt.status === 'pending' ? 'bg-primary/10 text-primary' : 'bg-secondary/10 text-secondary'
+                          appt.status === 'pending' ? 'bg-primary/10 text-primary' : 
+                          appt.status === 'completed' ? 'bg-green-100 text-green-600' : 'bg-secondary/10 text-secondary'
                         )}>{appt.status}</span>
+                        
+                        <div className="flex items-center gap-2 mt-2">
+                          <button 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openBookingDetails(appt);
+                            }}
+                            className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all shadow-sm"
+                          >
+                            <span className="material-symbols-outlined text-sm">visibility</span>
+                          </button>
+                           <Link href={`/admin/consultation/${appt._id}`} className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-secondary hover:bg-secondary hover:text-white transition-all shadow-sm">
+                            <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                          </Link>
+                        </div>
+
+                        {appt.status === 'confirmed' && (
+                          <button 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleStatusUpdate(appt._id, 'completed');
+                            }}
+                            className="bg-green-600 text-white px-3 py-1 rounded-lg text-[8px] font-black uppercase tracking-tighter hover:scale-105 active:scale-95 transition-all shadow-sm shadow-green-600/20 mt-2"
+                          >
+                            Consult Completed
+                          </button>
+                        )}
                         {appt.status === 'pending' && (
                           <button 
                             onClick={(e) => {
                               e.stopPropagation();
                               handleStatusUpdate(appt._id, 'confirmed');
                             }}
-                            className="bg-secondary text-white px-3 py-1 rounded-lg text-[8px] font-black uppercase tracking-tighter hover:scale-105 active:scale-95 transition-all shadow-sm shadow-secondary/20"
+                            className="bg-secondary text-white px-3 py-1 rounded-lg text-[8px] font-black uppercase tracking-tighter hover:scale-105 active:scale-95 transition-all shadow-sm shadow-secondary/20 mt-2"
                           >
                             Confirm Now
                           </button>
@@ -259,6 +329,173 @@ export default function AdminAppointments() {
               <span className="material-symbols-outlined text-lg">more_time</span>
               Update Availability
             </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Booking Details Modal */}
+      <AnimatePresence>
+        {isModalOpen && selectedBooking && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsModalOpen(false)}
+              className="absolute inset-0 bg-primary/20 backdrop-blur-sm"
+            />
+            <motion.div 
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              className="relative w-full max-w-lg bg-white rounded-[2.5rem] shadow-2xl overflow-hidden"
+            >
+              <div className="p-8 md:p-10">
+                <div className="flex justify-between items-start mb-8">
+                  <div className="flex items-center gap-4">
+                    <div className="w-16 h-16 rounded-2xl bg-slate-50 flex items-center justify-center text-primary text-2xl font-black uppercase shadow-inner">
+                      {selectedBooking.name.substring(0, 2)}
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-manrope font-black text-primary tracking-tight capitalize">{selectedBooking.name}</h3>
+                      <span className={cn(
+                        "px-3 py-1 rounded-full text-[9px] font-black capitalize tracking-widest inline-block mt-1",
+                        selectedBooking.status === 'confirmed' ? "bg-secondary/10 text-secondary" : 
+                        selectedBooking.status === 'completed' ? "bg-green-100 text-green-600" :
+                        "bg-slate-50 text-slate-500"
+                      )}>{selectedBooking.status}</span>
+                    </div>
+                  </div>
+                  <button onClick={() => setIsModalOpen(false)} className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-slate-400 hover:bg-error hover:text-white transition-all group">
+                    <X className="w-5 h-5 group-hover:rotate-90 transition-transform" />
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 gap-6 mb-10">
+                  <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl">
+                    <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-secondary shadow-sm">
+                      <Phone className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Phone Number</p>
+                      <p className="text-sm font-bold text-primary">{selectedBooking.phone}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl">
+                    <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-primary shadow-sm">
+                      <Mail className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Email Address</p>
+                      <p className="text-sm font-bold text-primary">{selectedBooking.email}</p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl">
+                      <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-slate-400 shadow-sm">
+                        <CalIcon className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Date</p>
+                        <p className="text-sm font-bold text-primary">{selectedBooking.date}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl">
+                      <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-slate-400 shadow-sm">
+                        <Clock className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Time</p>
+                        <p className="text-sm font-bold text-primary">{selectedBooking.time}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col p-4 bg-primary/5 border border-primary/5 rounded-2xl">
+                    <p className="text-[10px] font-black text-primary uppercase tracking-widest mb-1">Requested Service</p>
+                    <p className="text-lg font-manrope font-black text-primary">{selectedBooking.service}</p>
+                  </div>
+                </div>
+
+                <div className="flex gap-4">
+                  {selectedBooking.status === 'confirmed' ? (
+                    <button 
+                      onClick={() => handleStatusUpdate(selectedBooking._id, 'completed')}
+                      className="flex-1 py-4 bg-green-600 text-white rounded-2xl font-black text-[10px] capitalize tracking-[0.2em] shadow-xl shadow-green-600/20 hover:scale-[1.02] transition-all flex items-center justify-center gap-2"
+                    >
+                      <CheckCircle2 className="w-4 h-4" />
+                      Complete Consultation
+                    </button>
+                  ) : selectedBooking.status === 'pending' ? (
+                    <button 
+                      onClick={() => handleStatusUpdate(selectedBooking._id, 'confirmed')}
+                      className="flex-1 py-4 bg-secondary text-white rounded-2xl font-black text-[10px] capitalize tracking-[0.2em] shadow-xl shadow-secondary/20 hover:scale-[1.02] transition-all flex items-center justify-center gap-2"
+                    >
+                      <CheckCircle2 className="w-4 h-4" />
+                      Confirm Appointment
+                    </button>
+                  ) : null}
+                  <button 
+                    onClick={handlePrint}
+                    className="px-6 py-4 bg-slate-100 text-slate-600 rounded-2xl font-black text-[10px] capitalize tracking-[0.2em] hover:bg-slate-200 transition-all"
+                  >
+                    Print Receipt
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Hidden Print Template */}
+      <div id="print-area" className="hidden print:block p-12 bg-white text-black font-serif">
+        <div className="text-center border-b-2 border-black pb-8 mb-8">
+          <h1 className="text-3xl font-bold uppercase tracking-widest">Clinical Sanctuary</h1>
+          <p className="text-sm">Dr. Vikash Yadav - Chief Surgeon</p>
+          <p className="text-xs">Manipal Hospitals, New Delhi</p>
+        </div>
+        
+        <div className="space-y-6 mb-12">
+          <div className="flex justify-between border-b border-slate-200 pb-2">
+            <span className="font-bold">Receipt No:</span>
+            <span>#CS-{selectedBooking?._id.slice(-6).toUpperCase()}</span>
+          </div>
+          <div className="flex justify-between border-b border-slate-200 pb-2">
+            <span className="font-bold">Patient Name:</span>
+            <span className="capitalize">{selectedBooking?.name}</span>
+          </div>
+          <div className="flex justify-between border-b border-slate-200 pb-2">
+            <span className="font-bold">Service:</span>
+            <span>{selectedBooking?.service}</span>
+          </div>
+          <div className="flex justify-between border-b border-slate-200 pb-2">
+            <span className="font-bold">Appointment Date:</span>
+            <span>{selectedBooking?.date}</span>
+          </div>
+          <div className="flex justify-between border-b border-slate-200 pb-2">
+            <span className="font-bold">Time Slot:</span>
+            <span>{selectedBooking?.time}</span>
+          </div>
+          <div className="flex justify-between border-b border-slate-200 pb-2">
+            <span className="font-bold">Status:</span>
+            <span className="uppercase">{selectedBooking?.status}</span>
+          </div>
+        </div>
+
+        <div className="mt-20 pt-8 border-t border-black text-center text-[10px] space-y-1">
+          <p>This is a computer-generated clinical appointment receipt.</p>
+          <p>For emergencies, please contact +91 99999 88888</p>
+          <div className="mt-8 flex justify-between items-end italic opacity-50">
+            <div>
+              <p className="text-[8px]">Scan for records</p>
+              <div className="w-12 h-12 bg-black/5 border border-black/10 rounded"></div>
+            </div>
+            <div className="text-right border-t border-black/20 pt-2 min-w-[150px]">
+              <p>Authorized Signature</p>
+            </div>
           </div>
         </div>
       </div>

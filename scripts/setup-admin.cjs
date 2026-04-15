@@ -6,6 +6,7 @@ const MONGODB_URI = "mongodb+srv://jalandhar143184_db_user:tVbqyHOH4xq6oAGq@vika
 const UserSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
+  securityLevel: { type: String, default: 'Level 1' },
 });
 
 const User = mongoose.models.User || mongoose.model('User', UserSchema);
@@ -16,7 +17,7 @@ async function createAdmin() {
   const password = "password123"; // Change this!
   const hashedPassword = await bcrypt.hash(password, 12);
   
-  await User.create({ username, password: hashedPassword });
+  await User.create({ username, password: hashedPassword, securityLevel: 'Level 1' });
   console.log("Admin user created successfully!");
   process.exit();
 }

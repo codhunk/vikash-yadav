@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Phone, ArrowRight } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 // ─── Constants ─────────────────────────────────────────────────────────────────
 
@@ -30,14 +31,22 @@ function WaIcon({ size = 24 }: { size?: number }) {
 export default function WhatsAppButton() {
   const [isOpen, setIsPanelOpen] = useState(false);
   const [hasPulsed, setHasPulsed] = useState(true);
+  const pathname = usePathname();
 
-  // Auto-open after 4s
+  // Hooks must be called unconditionally at the top level
   useEffect(() => {
+    // Hide on admin routes - we handle this by returning null later, 
+    // but the hook itself must still be defined.
     const open = setTimeout(() => setIsPanelOpen(true), 4000);
     return () => {
       clearTimeout(open);
     };
   }, []);
+
+  // Early return ONLY after hooks are declared
+  if (pathname.startsWith("/admin")) {
+    return null;
+  }
 
   const toggle = () => {
     setIsPanelOpen((o) => !o);

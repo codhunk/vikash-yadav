@@ -184,7 +184,7 @@ export default function Home() {
             </div>
 
             <div className="mt-24 grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="p-4 rounded-[2rem] bg-white/5 backdrop-blur-md border border-white/10 flex items-start gap-6 hover:bg-white/10 transition-all group">
+              <div className="p-4 rounded-[1rem] bg-white/5 backdrop-blur-md border border-white/10 flex items-start gap-6 hover:bg-white/10 transition-all group">
                 <div className="w-14 h-14 rounded-2xl bg-primary/20 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all shadow-lg">
                   <span className="material-symbols-outlined font-light text-3xl">verified_user</span>
                 </div>
@@ -193,7 +193,7 @@ export default function Home() {
                   <p className="text-sm text-blue-100/60 mt-2 font-medium leading-relaxed">Fellowship-trained surgeon representing Manipal Hospitals.</p>
                 </div>
               </div>
-              <div className="p-4 rounded-[2rem] bg-white/5 backdrop-blur-md border border-white/10 flex items-start gap-6 hover:bg-white/10 transition-all group border-secondary/20">
+              <div className="p-4 rounded-[1rem] bg-white/5 backdrop-blur-md border border-white/10 flex items-start gap-6 hover:bg-white/10 transition-all group border-secondary/20">
                 <div className="w-14 h-14 rounded-2xl bg-secondary/20 flex items-center justify-center text-secondary-fixed group-hover:bg-secondary-fixed group-hover:text-on-secondary-fixed transition-all shadow-lg">
                   <span className="material-symbols-outlined font-light text-3xl">precision_manufacturing</span>
                 </div>
@@ -202,7 +202,7 @@ export default function Home() {
                   <p className="text-sm text-blue-100/60 mt-2 font-medium leading-relaxed">Utilizing advanced Robotic and Laser surgical systems.</p>
                 </div>
               </div>
-              <div className="p-4 rounded-[2rem] bg-white/5 backdrop-blur-md border border-white/10 flex items-start gap-6 hover:bg-white/10 transition-all group">
+              <div className="p-4 rounded-[1rem] bg-white/5 backdrop-blur-md border border-white/10 flex items-start gap-6 hover:bg-white/10 transition-all group">
                 <div className="w-14 h-14 rounded-2xl bg-clinical-teal/20 flex items-center justify-center text-clinical-teal group-hover:bg-clinical-teal group-hover:text-white transition-all shadow-lg">
                   <span className="material-symbols-outlined font-light text-3xl">home_health</span>
                 </div>

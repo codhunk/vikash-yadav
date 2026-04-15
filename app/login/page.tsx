@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 export default function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [securityLevel, setSecurityLevel] = useState("Level 1");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -20,7 +21,7 @@ export default function LoginPage() {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ username, password, securityLevel }),
       });
       const data = await res.json();
       if (data.success) {
@@ -80,6 +81,19 @@ export default function LoginPage() {
                 className="w-full bg-slate-50 border-2 border-transparent focus:border-secondary focus:bg-white rounded-2xl px-6 py-4 transition-all outline-none font-medium text-sm"
                 placeholder="••••••••"
               />
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-xs font-black text-slate-600 uppercase tracking-wider">Security Level</label>
+              <select
+                value={securityLevel}
+                onChange={(e) => setSecurityLevel(e.target.value)}
+                className="w-full bg-slate-50 border-2 border-transparent focus:border-secondary focus:bg-white rounded-2xl px-6 py-4 transition-all outline-none font-medium text-sm cursor-pointer"
+              >
+                <option>Level 1</option>
+                <option>Level 2</option>
+                <option>Level 3</option>
+              </select>
             </div>
 
             <button

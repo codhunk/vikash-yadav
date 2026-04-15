@@ -8,7 +8,7 @@ const BookingSchema = new Schema({
   time: { type: String, required: true },
   service: { type: String, required: true },
   message: { type: String },
-  status: { type: String, default: 'pending', enum: ['pending', 'confirmed', 'cancelled'] },
+  status: { type: String, default: 'confirmed', enum: ['pending', 'confirmed', 'cancelled', 'completed'] },
 }, { timestamps: true });
 
 const Booking = models.Booking || model('Booking', BookingSchema);

@@ -7,11 +7,11 @@ import jwt from 'jsonwebtoken';
 export async function POST(req: Request) {
   try {
     await connectDB();
-    const { username, password } = await req.json();
-
+    const { username, password, securityLevel } = await req.json();
     const user = await User.findOne({ username });
-    if (!user) {
-      return NextResponse.json({ success: false, message: 'Invalid credentials' }, { status: 401 });
+    const userSecurityLevel = user?.securityLevel || 'Level 1';
+    if (!user || userSecurityLevel !== securityLevel) {
+      return NextResponse.json({ success: false, message: 'Invalid credentials or security level' }, { status: 401 });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);

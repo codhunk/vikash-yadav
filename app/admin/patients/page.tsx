@@ -223,10 +223,13 @@ export default function PatientsDirectory() {
                         {patient.status}
                       </span>
                     </td>
-                    <td className="px-10 py-8 text-right">
+                    <td className="px-10 py-8 text-right flex items-center justify-end gap-3">
                        <button className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all shadow-sm">
                         <span className="material-symbols-outlined text-lg">visibility</span>
                       </button>
+                      <Link href={`/admin/consultation/history-${patient._id}?phone=${patient.phone}`} className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-secondary hover:bg-secondary hover:text-white transition-all shadow-sm">
+                        <span className="material-symbols-outlined text-lg">arrow_forward</span>
+                      </Link>
                     </td>
                   </tr>
                 ))

@@ -3,6 +3,23 @@ import connectDB from '@/server/mongodb';
 import Booking from '@/server/models/Booking';
 import { sendBookingConfirmation } from '@/server/lib/notifications';
 
+export async function GET(
+  req: Request,
+  context: { params: Promise<{ id: string }> }
+) {
+  try {
+    await connectDB();
+    const { id } = await context.params;
+    const booking = await Booking.findById(id);
+    if (!booking) {
+      return NextResponse.json({ success: false, message: 'Booking not found' }, { status: 404 });
+    }
+    return NextResponse.json({ success: true, data: booking });
+  } catch (error: any) {
+    return NextResponse.json({ success: false, message: error.message }, { status: 500 });
+  }
+}
+
 export async function PATCH(
   req: Request,
   context: { params: Promise<{ id: string }> }   // Next.js 16: params is a Promise

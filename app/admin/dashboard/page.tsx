@@ -2,6 +2,8 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
+import { X, CheckCircle2, Phone, Mail, Clock, Calendar as CalIcon, User } from "lucide-react";
 
 interface Booking {
   _id: string;
@@ -18,6 +20,8 @@ interface Booking {
 export default function AdminDashboard() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     fetchBookings();
@@ -37,6 +41,34 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleStatusUpdate = async (id: string, newStatus: string) => {
+    try {
+      const res = await fetch(`/api/bookings/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus })
+      });
+      const data = await res.json();
+      if (data.success) {
+        fetchBookings();
+        if (selectedBooking?._id === id) {
+          setSelectedBooking({ ...selectedBooking, status: newStatus });
+        }
+      }
+    } catch (error) {
+      console.error("Failed to update status:", error);
+    }
+  };
+
+  const openBookingDetails = (booking: Booking) => {
+    setSelectedBooking(booking);
+    setIsModalOpen(true);
+  };
+
+  const handlePrint = () => {
+    window.print();
+  };
+
   const stats = {
     total: bookings.length,
     new: bookings.filter(b => {
@@ -44,13 +76,15 @@ export default function AdminDashboard() {
       const today = new Date();
       return createdDate.toDateString() === today.toDateString();
     }).length,
-    pending: bookings.filter(b => b.status === 'pending').length
+    pending: bookings.filter(b => b.status === 'pending').length,
+    completed: bookings.filter(b => b.status === 'completed').length,
+    utilization: bookings.length > 0 ? Math.round((bookings.filter(b => b.status === 'completed' || b.status === 'confirmed').length / bookings.length) * 100) : 0
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 ">
       {/* Header Inside Dashboard */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 ">
         <div>
           <h1 className="text-3xl font-extrabold text-primary font-manrope capitalize">Welcome, Dr. Yadav</h1>
           <p className="text-on-surface-variant text-sm font-medium">Monitoring the sanctuary's surgical flow today.</p>
@@ -110,7 +144,7 @@ export default function AdminDashboard() {
           <section>
             <div className="flex items-center justify-between mb-8">
               <h3 className="text-xl font-manrope font-black text-primary capitalize">Upcoming Appointments</h3>
-              <button 
+              <button
                 onClick={fetchBookings}
                 className="text-[10px] font-bold text-secondary capitalize hover:text-primary transition-colors flex items-center gap-1"
               >
@@ -142,14 +176,32 @@ export default function AdminDashboard() {
                     </div>
                     <div className="flex items-center gap-4">
                       <span className={cn(
-                        "hidden sm:inline-block px-4 py-2 text-[10px] font-black rounded-xl capitalize border",
-                        apt.status === 'confirmed' ? "bg-green-50 text-green-600 border-green-100" : "bg-slate-50 text-slate-500 border-slate-100"
+                        "hidden sm:inline-flex px-4 py-2 text-[9px] font-black rounded-xl capitalize border tracking-widest",
+                        apt.status === 'confirmed' ? "bg-secondary/10 text-secondary border-secondary/20" :
+                          apt.status === 'completed' ? "bg-green-100 text-green-600 border-green-200" :
+                            "bg-slate-50 text-slate-500 border-slate-100"
                       )}>
                         {apt.status}
                       </span>
-                      <button className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all">
-                        <span className="material-symbols-outlined">expand_content</span>
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => openBookingDetails(apt)}
+                          className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all shadow-sm"
+                        >
+                          <span className="material-symbols-outlined text-lg">visibility</span>
+                        </button>
+                        <button
+                          onClick={() => apt.status === 'confirmed' ? handleStatusUpdate(apt._id, 'completed') : handleStatusUpdate(apt._id, 'confirmed')}
+                          className={cn(
+                            "w-10 h-10 rounded-xl flex items-center justify-center transition-all shadow-sm",
+                            apt.status === 'confirmed' ? "bg-green-50 text-green-600 hover:bg-green-600 hover:text-white" : "bg-secondary/10 text-secondary hover:bg-secondary hover:text-white"
+                          )}
+                        >
+                          <span className="material-symbols-outlined text-lg">
+                            {apt.status === 'confirmed' ? 'check_circle' : 'done_all'}
+                          </span>
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))
@@ -171,7 +223,7 @@ export default function AdminDashboard() {
                   <p className="text-[10px] text-slate-400 font-bold capitalize mt-1">Schedule patient visit</p>
                 </div>
               </Link>
-              <button className="flex items-center gap-6 p-4 bg-white rounded-[2rem] transition-all border border-slate-50 group text-left">
+              <Link href="/admin/settings?tab=clinical" className="flex items-center gap-6 p-4 bg-white rounded-[2rem] transition-all border border-slate-50 group text-left shadow-sm hover:shadow-md">
                 <div className="w-16 h-16 rounded-[1.5rem] bg-primary/10 text-primary flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all">
                   <span className="material-symbols-outlined text-3xl font-light">edit_calendar</span>
                 </div>
@@ -179,7 +231,7 @@ export default function AdminDashboard() {
                   <p className="font-manrope font-black text-primary capitalize text-sm">Manage Hours</p>
                   <p className="text-[10px] text-slate-400 font-bold capitalize mt-1">Update clinical schedule</p>
                 </div>
-              </button>
+              </Link>
             </div>
           </section>
         </div>
@@ -189,7 +241,7 @@ export default function AdminDashboard() {
           <section>
             <div className="flex items-center justify-between mb-8">
               <h3 className="text-xl font-manrope font-black text-primary capitalize">Recent Patients</h3>
-              <button className="text-[10px] font-bold text-secondary capitalize hover:text-primary transition-colors">Directory</button>
+              <Link href="/admin/patients" className="text-[10px] font-bold text-secondary capitalize hover:text-primary transition-colors">Directory</Link>
             </div>
             <div className="grid grid-cols-1 gap-4">
               {bookings.slice(0, 3).map((apt) => (
@@ -201,9 +253,9 @@ export default function AdminDashboard() {
                     <h4 className="font-bold text-primary text-sm">{apt.name}</h4>
                     <p className="text-[9px] text-slate-400 font-bold capitalize mt-1">{apt.phone}</p>
                   </div>
-                  <button className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
+                  <Link href={`/admin/consultation/${apt._id}`} className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
                     <span className="material-symbols-outlined text-lg">arrow_forward</span>
-                  </button>
+                  </Link>
                 </div>
               ))}
             </div>
@@ -221,14 +273,184 @@ export default function AdminDashboard() {
             </div>
             <div className="space-y-4">
               <div className="h-2 w-full bg-slate-200 rounded-full overflow-hidden">
-                <div className="h-full bg-secondary w-2/3"></div>
+                <div
+                  className="h-full bg-secondary transition-all duration-1000"
+                  style={{ width: `${stats.utilization}%` }}
+                ></div>
               </div>
               <div className="flex justify-between items-center text-[10px] font-black text-slate-400 capitalize">
                 <span>Capacity Utilized</span>
-                <span className="text-secondary">65%</span>
+                <span className="text-secondary">{stats.utilization}%</span>
               </div>
             </div>
           </section>
+        </div>
+      </div>
+
+      {/* Booking Details Modal */}
+      <AnimatePresence>
+        {isModalOpen && selectedBooking && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsModalOpen(false)}
+              className="absolute inset-0 bg-primary/20 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              className="relative w-full max-w-lg bg-white rounded-[2.5rem] shadow-2xl overflow-hidden"
+            >
+              <div className="p-8 md:p-10">
+                <div className="flex justify-between items-start mb-8">
+                  <div className="flex items-center gap-4">
+                    <div className="w-16 h-16 rounded-2xl bg-slate-50 flex items-center justify-center text-primary text-2xl font-black uppercase shadow-inner">
+                      {selectedBooking.name.substring(0, 2)}
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-manrope font-black text-primary tracking-tight capitalize">{selectedBooking.name}</h3>
+                      <span className={cn(
+                        "px-3 py-1 rounded-full text-[9px] font-black capitalize tracking-widest inline-block mt-1",
+                        selectedBooking.status === 'confirmed' ? "bg-secondary/10 text-secondary" :
+                          selectedBooking.status === 'completed' ? "bg-green-100 text-green-600" :
+                            "bg-slate-50 text-slate-500"
+                      )}>{selectedBooking.status}</span>
+                    </div>
+                  </div>
+                  <button onClick={() => setIsModalOpen(false)} className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-slate-400 hover:bg-error hover:text-white transition-all group">
+                    <X className="w-5 h-5 group-hover:rotate-90 transition-transform" />
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 gap-6 mb-10">
+                  <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl">
+                    <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-secondary shadow-sm">
+                      <Phone className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Phone Number</p>
+                      <p className="text-sm font-bold text-primary">{selectedBooking.phone}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl">
+                    <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-primary shadow-sm">
+                      <Mail className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Email Address</p>
+                      <p className="text-sm font-bold text-primary">{selectedBooking.email}</p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl">
+                      <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-slate-400 shadow-sm">
+                        <CalIcon className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Date</p>
+                        <p className="text-sm font-bold text-primary">{selectedBooking.date}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl">
+                      <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-slate-400 shadow-sm">
+                        <Clock className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Time</p>
+                        <p className="text-sm font-bold text-primary">{selectedBooking.time}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col p-4 bg-primary/5 border border-primary/5 rounded-2xl">
+                    <p className="text-[10px] font-black text-primary uppercase tracking-widest mb-1">Requested Service</p>
+                    <p className="text-lg font-manrope font-black text-primary">{selectedBooking.service}</p>
+                  </div>
+                </div>
+
+                <div className="flex gap-4">
+                  {selectedBooking.status === 'confirmed' ? (
+                    <button
+                      onClick={() => handleStatusUpdate(selectedBooking._id, 'completed')}
+                      className="flex-1 py-4 bg-green-600 text-white rounded-2xl font-black text-[10px] capitalize tracking-[0.2em] shadow-xl shadow-green-600/20 hover:scale-[1.02] transition-all flex items-center justify-center gap-2"
+                    >
+                      <CheckCircle2 className="w-4 h-4" />
+                      Complete Consultation
+                    </button>
+                  ) : selectedBooking.status === 'pending' ? (
+                    <button
+                      onClick={() => handleStatusUpdate(selectedBooking._id, 'confirmed')}
+                      className="flex-1 py-4 bg-secondary text-white rounded-2xl font-black text-[10px] capitalize tracking-[0.2em] shadow-xl shadow-secondary/20 hover:scale-[1.02] transition-all flex items-center justify-center gap-2"
+                    >
+                      <CheckCircle2 className="w-4 h-4" />
+                      Confirm Appointment
+                    </button>
+                  ) : null}
+                  <button
+                    onClick={handlePrint}
+                    className="px-6 py-4 bg-slate-100 text-slate-600 rounded-2xl font-black text-[10px] capitalize tracking-[0.2em] hover:bg-slate-200 transition-all"
+                  >
+                    Print Receipt
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Hidden Print Template */}
+      <div id="print-area" className="hidden print:block p-12 bg-white text-black font-serif">
+        <div className="text-center border-b-2 border-black pb-8 mb-8">
+          <h1 className="text-3xl font-bold uppercase tracking-widest">Clinical Sanctuary</h1>
+          <p className="text-sm">Dr. Vikash Yadav - Chief Surgeon</p>
+          <p className="text-xs">Manipal Hospitals, New Delhi</p>
+        </div>
+
+        <div className="space-y-6 mb-12">
+          <div className="flex justify-between border-b border-slate-200 pb-2">
+            <span className="font-bold">Receipt No:</span>
+            <span>#CS-{selectedBooking?._id.slice(-6).toUpperCase()}</span>
+          </div>
+          <div className="flex justify-between border-b border-slate-200 pb-2">
+            <span className="font-bold">Patient Name:</span>
+            <span className="capitalize">{selectedBooking?.name}</span>
+          </div>
+          <div className="flex justify-between border-b border-slate-200 pb-2">
+            <span className="font-bold">Service:</span>
+            <span>{selectedBooking?.service}</span>
+          </div>
+          <div className="flex justify-between border-b border-slate-200 pb-2">
+            <span className="font-bold">Appointment Date:</span>
+            <span>{selectedBooking?.date}</span>
+          </div>
+          <div className="flex justify-between border-b border-slate-200 pb-2">
+            <span className="font-bold">Time Slot:</span>
+            <span>{selectedBooking?.time}</span>
+          </div>
+          <div className="flex justify-between border-b border-slate-200 pb-2">
+            <span className="font-bold">Status:</span>
+            <span className="uppercase">{selectedBooking?.status}</span>
+          </div>
+        </div>
+
+        <div className="mt-20 pt-8 border-t border-black text-center text-[10px] space-y-1">
+          <p>This is a computer-generated clinical appointment receipt.</p>
+          <p>For emergencies, please contact +91 99999 88888</p>
+          <div className="mt-8 flex justify-between items-end italic opacity-50">
+            <div>
+              <p className="text-[8px]">Scan for records</p>
+              <div className="w-12 h-12 bg-black/5 border border-black/10 rounded"></div>
+            </div>
+            <div className="text-right border-t border-black/20 pt-2 min-w-[150px]">
+              <p>Authorized Signature</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>

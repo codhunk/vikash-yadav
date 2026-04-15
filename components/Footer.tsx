@@ -7,18 +7,26 @@ const Footer = () => {
       links: [
         { name: "Services", href: "/services" },
         { name: "About", href: "/about" },
+        { name: "Expertise", href: "/expertise" },
         { name: "Reviews", href: "/reviews" },
-        { name: "Booking", href: "/booking" },
+        { name: "Patient Care", href: "/patient-care" },
+      ],
+    },
+    {
+      title: "Contact Desk",
+      links: [
+        { name: "+91 87082 55349", href: "tel:+918708255349" },
+        { name: "vikash.yadav@gmail.com", href: "mailto:vikash.yadav@gmail.com" },
+        { name: "Dwarka, New Delhi", href: "https://maps.google.com" },
+        { name: "Book Appointment", href: "/booking" },
       ],
     },
     {
       title: "Administrative",
       links: [
-        { name: "Admin Portal", href: "/admin/dashboard" },
-        { name: "Login", href: "/login" },
+        { name: "Admin Portal", href: "/login" },
         { name: "Privacy Policy", href: "/privacy" },
         { name: "Terms of Service", href: "/terms" },
-        { name: "Patient Care", href: "/patient-care" },
       ],
     },
   ];
@@ -31,55 +39,72 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="w-full bg-gradient-to-br from-[#002B5B] via-[#001F3D] to-[#001529] pt-10 pb-8 relative overflow-hidden font-inter text-white">
+    <footer className="w-full bg-gradient-to-br from-[#002B5B] via-[#001F3D] to-[#001529] pt-16 pb-8 relative overflow-hidden font-inter text-white">
       {/* Background Decor */}
       <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
       <div className="absolute -bottom-20 -left-20 w-96 h-96 bg-primary/20 rounded-full blur-[120px] -z-10 opacity-20"></div>
       <div className="absolute -top-20 -right-20 w-96 h-96 bg-secondary/10 rounded-full blur-[120px] -z-10 opacity-20"></div>
 
-      <div className="max-w-7xl mx-auto px-8 grid grid-cols-1 md:grid-cols-12 gap-20">
+      <div className="max-w-7xl mx-auto px-8 grid grid-cols-1 md:grid-cols-12 gap-16 md:gap-20">
         {/* Brand Column */}
-        <div className="md:col-span-5 space-y-10">
+        <div className="md:col-span-4 space-y-10">
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-white to-slate-200 flex items-center justify-center shadow-2xl text-primary">
               <span className="material-symbols-outlined text-3xl font-black">medical_information</span>
             </div>
             <div className="flex flex-col">
               <span className="text-2xl font-manrope font-black text-white">Dr. Vikash Yadav</span>
-              <span className="text-[10px] font-inter font-bold text-secondary-fixed mt-1 tracking-wider">Clinical Sanctuary</span>
+              <span className="text-[10px] font-inter font-black text-secondary uppercase mt-1 tracking-wider">Clinical Sanctuary</span>
             </div>
           </div>
-          <p className="text-blue-100/70 font-medium leading-relaxed max-w-sm text-sm">
-            Bridging clinical precision with human-centric restorative medicine for over 15 years. Rated 4.9/5 by our dedicated patient community.
-          </p>
-          <div className="flex items-center gap-4">
+          <div className="space-y-6">
+            <p className="text-blue-100/70 font-medium leading-relaxed max-w-sm text-sm">
+              Bridging clinical precision with human-centric restorative medicine. Specializing in minimal-access surgery at Manipal Hospital, Dwarka.
+            </p>
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center gap-3 text-blue-100/80 group">
+                <span className="material-symbols-outlined text-lg text-secondary group-hover:scale-110 transition-transform">pin_drop</span>
+                <span className="text-xs font-bold font-inter leading-relaxed">Manipal Hospital, Sector 6, Dwarka, New Delhi</span>
+              </div>
+              <div className="flex items-center gap-3 text-blue-100/80 group">
+                <span className="material-symbols-outlined text-lg text-secondary group-hover:scale-110 transition-transform">call</span>
+                <span className="text-xs font-bold font-inter">+91 87082 55349</span>
+              </div>
+              <div className="flex items-center gap-3 text-blue-100/80 group">
+                <span className="material-symbols-outlined text-lg text-secondary group-hover:scale-110 transition-transform">mail</span>
+                <span className="text-xs font-bold font-inter">vikash.yadav@gmail.com</span>
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-4 pt-4">
             {socialLinks.map((social) => (
               <Link
                 key={social.name}
                 href="#"
                 className={cn(
-                  "w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white/50 hover:text-white transition-all duration-500 hover:scale-110 active:scale-95 group/social relative",
+                  "w-11 h-11 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/50 hover:text-white transition-all duration-500 hover:scale-110 active:scale-95 group/social relative",
                   "hover:bg-gradient-to-br " + social.color
                 )}
               >
-                <span className="material-symbols-outlined group-hover/social:rotate-12 transition-transform">{social.icon}</span>
+                <span className="material-symbols-outlined text-xl group-hover/social:rotate-12 transition-transform">{social.icon}</span>
               </Link>
             ))}
           </div>
         </div>
 
         {/* Links Columns */}
-        <div className="md:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-10">
+        <div className="md:col-span-8 grid grid-cols-1 sm:grid-cols-3 gap-10">
           {footerLinks.map((section) => (
-            <div key={section.title} className="space-y-2">
-              <h4 className="font-manrope font-black text-secondary-fixed text-xs tracking-widest">{section.title}</h4>
+            <div key={section.title} className="space-y-6">
+              <h4 className="font-manrope font-black text-secondary text-[10px] uppercase tracking-[0.2em]">{section.title}</h4>
               <ul className="space-y-4">
                 {section.links.map((link) => (
                   <li key={link.name}>
                     <Link
                       href={link.href}
-                      className="text-blue-100/60 font-inter font-bold text-sm hover:text-white hover:pl-2 transition-all duration-300"
+                      className="text-blue-100/60 font-inter font-extrabold text-[13px] hover:text-white hover:pl-2 transition-all duration-300 inline-flex items-center gap-2 group"
                     >
+                      <span className="w-1.5 h-1.5 rounded-full bg-white/0 group-hover:bg-secondary transition-all"></span>
                       {link.name}
                     </Link>
                   </li>

@@ -269,11 +269,19 @@ export default function AdminSettings() {
                             <div className="w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center font-black text-primary group-hover:bg-primary group-hover:text-white transition-all uppercase">
                               {admin.username.substring(0, 2)}
                             </div>
-                            <div className="space-y-1">
+                            <div className="flex flex-col flex-1 space-y-1">
                               <p className="text-sm font-black text-primary capitalize">{admin.username}</p>
                               <p className="text-[10px] font-bold text-slate-400 capitalize tracking-widest">
                                 Role: Super Admin • Joined {new Date(admin.createdAt).toLocaleDateString()}
                               </p>
+                            </div>
+                            <div className="flex items-center gap-2 self-start">
+                              <button className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all shadow-sm">
+                                <span className="material-symbols-outlined text-sm">visibility</span>
+                              </button>
+                               <button className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-secondary hover:bg-secondary hover:text-white transition-all shadow-sm">
+                                <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                              </button>
                             </div>
                           </div>
                         ))}
