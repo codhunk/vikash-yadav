@@ -240,7 +240,7 @@ export default function ExpertisePage() {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="relative py-16 bg-gradient-to-br from-[#002B5B] via-[#00478D] to-[#0d9488] text-white overflow-hidden">
+      <section className="relative py-28 bg-gradient-to-br from-[#002B5B] via-[#00478D] to-[#0d9488] text-white overflow-hidden">
         <div className="absolute top-0 right-0 w-1/2 h-full bg-white/5 -skew-x-12 translate-x-1/3 pointer-events-none z-0"></div>
         <div className="absolute -top-32 -left-32 w-96 h-96 bg-secondary/20 rounded-full blur-[120px] pointer-events-none"></div>
 
@@ -293,13 +293,13 @@ export default function ExpertisePage() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {expertiseAreas.map((area, i) => (
-              <div key={i} className="group space-y-6 p-8 rounded-[1rem] bg-slate-50/50 hover:bg-white hover:shadow-2xl transition-all duration-700">
+              <div key={i} className="group space-y-6 p-8 rounded-[1rem] bg-slate-100 hover:bg-white hover:shadow-2xl transition-all duration-700">
                 <div className="w-14 h-14 rounded-[1rem] bg-white shadow-xl shadow-slate-100 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white group-hover:scale-110 transition-all">
                   <span className="material-symbols-outlined text-2xl font-light">{i % 2 === 0 ? "stethoscope" : "healing"}</span>
                 </div>
                 <div className="space-y-3">
-                  <h3 className="text-lg font-black text-primary uppercase">{area.title}</h3>
-                  <p className="text-xs font-bold text-slate-400 leading-relaxed uppercase opacity-80">{area.desc}</p>
+                  <h3 className="text-lg font-bold text-primary uppercase">{area.title}</h3>
+                  <p className="text-sm font-bold text-slate-400 ">{area.desc}</p>
                 </div>
               </div>
             ))}
@@ -356,7 +356,7 @@ export default function ExpertisePage() {
             <div className="lg:w-1/2 space-y-12">
               <div className="space-y-4">
                 <span className="text-secondary font-black uppercase text-sm">Academic Authority</span>
-                <h2 className="text-3xl md:text-5xl font-black text-primary uppercase">Fellowship <br /> & Global Membership</h2>
+                <h2 className="text-3xl md:text-4xl font-black text-primary uppercase">Fellowship <br /> & Global Membership</h2>
                 <div className="w-20 h-1.5 bg-secondary rounded-full"></div>
               </div>
               <div className="space-y-8">
@@ -383,12 +383,12 @@ export default function ExpertisePage() {
                 <div className="relative z-10 space-y-8">
                   <div className="space-y-3">
                     <div className="inline-block px-3 py-1 bg-secondary/10 rounded-lg text-[10px] font-black text-secondary uppercase mb-2">Education Track</div>
-                    <h4 className="text-2xl md:text-3xl font-black text-primary uppercase">MBBS & MS Surgery</h4>
+                    <h4 className="text-2xl md:text-2xl font-black text-primary uppercase">MBBS & MS Surgery</h4>
                     <p className="text-sm font-bold text-slate-400 captilize leading-relaxed">Post Graduate Institute of Medical Sciences, Rohtak | Maharaja Agrasen Medical College</p>
                   </div>
                   <div className="space-y-3">
                     <div className="inline-block px-3 py-1 bg-primary/10 rounded-lg text-[10px] font-black text-primary uppercase mb-2">Specialized Training</div>
-                    <h4 className="text-2xl md:text-3xl font-black text-primary uppercase">FNB Minimal Access</h4>
+                    <h4 className="text-2xl md:text-2xl font-black text-primary uppercase">FNB Minimal Access</h4>
                     <p className="text-sm font-bold text-slate-400 captilize leading-relaxed">Fellowship from Max Super Speciality Hospital, Saket, New Delhi</p>
                   </div>
                 </div>
@@ -405,7 +405,7 @@ export default function ExpertisePage() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-16 space-y-4">
             <span className="text-primary font-black captilize text-sm">Academic Contributions</span>
-            <h2 className="text-3xl md:text-5xl font-black text-primary captilize">Talks & Publications</h2>
+            <h2 className="text-3xl md:text-4xl font-black text-primary captilize">Talks & Publications</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-5xl mx-auto">
             {publications.map((bib, i) => (
