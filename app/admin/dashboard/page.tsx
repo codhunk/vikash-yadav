@@ -32,7 +32,12 @@ export default function AdminDashboard() {
       const res = await fetch("/api/bookings");
       const data = await res.json();
       if (data.success) {
-        setBookings(data.data);
+        // Sort by date and time (nearest first)
+        const sorted = data.data.sort((a: Booking, b: Booking) => {
+          if (a.date !== b.date) return a.date.localeCompare(b.date);
+          return a.time.localeCompare(b.time);
+        });
+        setBookings(sorted);
       }
     } catch (error) {
       console.error("Failed to fetch bookings:", error);

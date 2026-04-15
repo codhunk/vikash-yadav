@@ -17,6 +17,14 @@ interface Booking {
   createdAt: string;
 }
 
+// Deterministic date formatter to match the database storage format
+const formatDate = (date: Date): string => {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+};
+
 export default function AdminAppointments() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -25,6 +33,7 @@ export default function AdminAppointments() {
   const [statusFilter, setStatusFilter] = useState("All Status");
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<"calendar" | "list">("calendar");
 
   useEffect(() => {
     fetchBookings();
@@ -35,7 +44,12 @@ export default function AdminAppointments() {
       const res = await fetch("/api/bookings");
       const data = await res.json();
       if (data.success) {
-        setBookings(data.data);
+        // Sort by date and time
+        const sorted = data.data.sort((a: Booking, b: Booking) => {
+          if (a.date !== b.date) return a.date.localeCompare(b.date);
+          return a.time.localeCompare(b.time);
+        });
+        setBookings(sorted);
       }
     } catch (error) {
       console.error("Failed to fetch bookings:", error);
@@ -98,15 +112,26 @@ export default function AdminAppointments() {
   const prevMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 0);
   const prevMonthDaysToShow = Array.from({ length: startDay }, (_, i) => prevMonth.getDate() - startDay + i + 1);
 
-  // Filter daily schedule for the selected/current date
+  // Use the standardized date format for filtering (matching database storage)
+  const selectedDateKey = formatDate(currentDate);
   const selectedDateStr = currentDate.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
-  const dailySchedule = bookings.filter(b => b.date === selectedDateStr);
+  
+  const dailySchedule = bookings.filter(b => b.date === selectedDateKey);
 
   const filteredBookings = bookings.filter(b => {
     const matchesSearch = b.name.toLowerCase().includes(searchQuery.toLowerCase()) || b.phone.includes(searchQuery);
     const matchesStatus = statusFilter === "All Status" || b.status.toLowerCase() === statusFilter.toLowerCase();
     return matchesSearch && matchesStatus;
   });
+
+  // Group upcoming bookings for List View
+  const todayKey = formatDate(new Date());
+  const groupedUpcoming = filteredBookings.reduce((acc: any, booking) => {
+    const date = booking.date;
+    if (!acc[date]) acc[date] = [];
+    acc[date].push(booking);
+    return acc;
+  }, {});
 
   return (
     <div className="space-y-6">
@@ -115,10 +140,26 @@ export default function AdminAppointments() {
           <h2 className="text-2xl font-manrope font-black text-primary tracking-tight capitalize">Appointment Scheduler</h2>
           <p className="text-on-surface-variant text-sm font-medium">Manage patient bookings and clinical availability.</p>
         </div>
-        <div className="flex items-center gap-4 bg-white/50 p-2  border border-outline-variant/10 shadow-sm">
+        <div className="flex items-center gap-4 bg-white/50 p-2 border border-outline-variant/10 shadow-sm rounded-2xl">
           <div className="flex bg-slate-50 rounded-xl p-1">
-            <button className="px-6 py-2 text-[10px] font-black capitalize tracking-widest bg-primary text-white rounded-lg shadow-lg shadow-primary/20 transition-all">Calendar</button>
-            <button className="px-6 py-2 text-[10px] font-black capitalize tracking-widest text-on-surface-variant hover:text-primary transition-colors">List View</button>
+            <button 
+              onClick={() => setViewMode("calendar")}
+              className={cn(
+                "px-6 py-2 text-[10px] font-black capitalize tracking-widest rounded-lg transition-all",
+                viewMode === "calendar" ? "bg-primary text-white shadow-lg shadow-primary/20" : "text-on-surface-variant hover:text-primary"
+              )}
+            >
+              Calendar
+            </button>
+            <button 
+              onClick={() => setViewMode("list")}
+              className={cn(
+                "px-6 py-2 text-[10px] font-black capitalize tracking-widest rounded-lg transition-all",
+                viewMode === "list" ? "bg-primary text-white shadow-lg shadow-primary/20" : "text-on-surface-variant hover:text-primary"
+              )}
+            >
+              List View
+            </button>
           </div>
           <div className="h-8 w-px bg-slate-200"></div>
           <button className="flex items-center gap-2 text-primary font-black text-[10px] capitalize tracking-widest px-4 py-2 hover:bg-slate-50 rounded-xl transition-all">
@@ -162,63 +203,120 @@ export default function AdminAppointments() {
             </div>
           </section>
 
-          <section className="bg-white rounded-[1rem] p-6 shadow-sm border border-outline-variant/5">
-            <div className="flex justify-between items-center mb-6">
-              <div className="space-y-1">
-                <h3 className="text-2xl font-manrope font-black text-primary capitalize">{monthYearString}</h3>
-                <div className="flex h-1 w-12 bg-secondary rounded-[1rem]"></div>
+          {viewMode === "calendar" ? (
+            <section className="bg-white rounded-[1rem] p-6 shadow-sm border border-outline-variant/5">
+              <div className="flex justify-between items-center mb-6">
+                <div className="space-y-1">
+                  <h3 className="text-2xl font-manrope font-black text-primary capitalize">{monthYearString}</h3>
+                  <div className="flex h-1 w-12 bg-secondary rounded-[1rem]"></div>
+                </div>
+                <div className="flex gap-4">
+                  <button onClick={handlePrevMonth} className="w-12 h-12 flex items-center justify-center bg-slate-50 hover:bg-primary hover:text-white  transition-all shadow-sm rounded-xl">
+                    <span className="material-symbols-outlined font-light">chevron_left</span>
+                  </button>
+                  <button onClick={handleNextMonth} className="w-12 h-12 flex items-center justify-center bg-slate-50 hover:bg-primary hover:text-white  transition-all shadow-sm rounded-xl">
+                    <span className="material-symbols-outlined font-light">chevron_right</span>
+                  </button>
+                </div>
               </div>
-              <div className="flex gap-4">
-                <button onClick={handlePrevMonth} className="w-12 h-12 flex items-center justify-center bg-slate-50 hover:bg-primary hover:text-white  transition-all shadow-sm rounded-xl">
-                  <span className="material-symbols-outlined font-light">chevron_left</span>
-                </button>
-                <button onClick={handleNextMonth} className="w-12 h-12 flex items-center justify-center bg-slate-50 hover:bg-primary hover:text-white  transition-all shadow-sm rounded-xl">
-                  <span className="material-symbols-outlined font-light">chevron_right</span>
-                </button>
+
+              <div className="overflow-x-auto pb-4 custom-scrollbar">
+                <div className="grid grid-cols-7 gap-4 min-w-[600px] lg:min-w-0">
+                  {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+                    <div key={day} className="text-[10px] font-black capitalize text-slate-400 pb-6 text-center tracking-[0.2em]">{day}</div>
+                  ))}
+
+                  {prevMonthDaysToShow.map(d => (
+                    <div key={`prev-${d}`} className="h-24 md:h-32 p-4 text-slate-200 text-xs font-bold opacity-30">{d}</div>
+                  ))}
+
+                  {Array.from({ length: monthDays }, (_, i) => i + 1).map(day => {
+                    const dayObj = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+                    const bookingDateKey = formatDate(dayObj);
+                    const bookingsCount = bookings.filter(b => b.date === bookingDateKey).length;
+
+                    return (
+                      <div
+                        key={day}
+                        onClick={() => setCurrentDate(dayObj)}
+                        className={cn(
+                          "h-18 md:h-20 p-4 rounded-[1.5rem] md:rounded-[1rem] relative border-2 transition-all cursor-pointer group flex flex-col justify-between",
+                          isToday(day)
+                            ? 'bg-primary text-white shadow-2xl shadow-primary/30 ring-4 ring-primary-container/10 border-primary'
+                            : 'bg-slate-50 border-transparent hover:border-secondary'
+                        )}
+                      >
+                        <span className={cn("text-xs font-black", isToday(day) ? 'text-white' : 'text-primary')}>
+                          {day < 10 ? `0${day}` : day}
+                        </span>
+                        {bookingsCount > 0 && !isToday(day) && (
+                          <div className="flex h-1.5 w-1.5 bg-secondary rounded-full mx-auto mt-1 animate-pulse"></div>
+                        )}
+                        {isToday(day) && (
+                          <div className="mt-auto text-[8px] md:text-[9px] leading-tight font-black capitalize tracking-[0.1em] md:tracking-[0.2em] opacity-80 decoration-secondary underline decoration-2 underline-offset-4">Today</div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-
-            <div className="overflow-x-auto pb-4 custom-scrollbar">
-              <div className="grid grid-cols-7 gap-4 min-w-[600px] lg:min-w-0">
-                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                  <div key={day} className="text-[10px] font-black capitalize text-slate-400 pb-6 text-center tracking-[0.2em]">{day}</div>
-                ))}
-
-                {prevMonthDaysToShow.map(d => (
-                  <div key={`prev-${d}`} className="h-24 md:h-32 p-4 text-slate-200 text-xs font-bold opacity-30">{d}</div>
-                ))}
-
-                {Array.from({ length: monthDays }, (_, i) => i + 1).map(day => {
-                  const dayObj = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
-                  const dateStr = dayObj.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
-                  const bookingsCount = bookings.filter(b => b.date === dateStr).length;
-
-                  return (
-                    <div
-                      key={day}
-                      onClick={() => setCurrentDate(dayObj)}
-                      className={cn(
-                        "h-18 md:h-20 p-4 rounded-[1.5rem] md:rounded-[1rem] relative border-2 transition-all cursor-pointer group flex flex-col justify-between",
-                        isToday(day)
-                          ? 'bg-primary text-white shadow-2xl shadow-primary/30 ring-4 ring-primary-container/10 border-primary'
-                          : 'bg-slate-50 border-transparent hover:border-secondary'
-                      )}
-                    >
-                      <span className={cn("text-xs font-black", isToday(day) ? 'text-white' : 'text-primary')}>
-                        {day < 10 ? `0${day}` : day}
-                      </span>
-                      {bookingsCount > 0 && !isToday(day) && (
-                        <div className="flex h-1.5 w-1.5 bg-secondary rounded-full mx-auto mt-1 animate-pulse"></div>
-                      )}
-                      {isToday(day) && (
-                        <div className="mt-auto text-[8px] md:text-[9px] leading-tight font-black capitalize tracking-[0.1em] md:tracking-[0.2em] opacity-80 decoration-secondary underline decoration-2 underline-offset-4">Today</div>
-                      )}
+            </section>
+          ) : (
+            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              {Object.keys(groupedUpcoming).length === 0 ? (
+                <div className="bg-white rounded-3xl p-12 text-center border-2 border-dashed border-slate-100">
+                  <span className="material-symbols-outlined text-4xl text-slate-200 mb-2">person_search</span>
+                  <p className="text-slate-400 font-bold text-sm">No upcoming appointments found</p>
+                </div>
+              ) : (
+                Object.entries(groupedUpcoming).map(([dateKey, dayBookings]: [string, any]) => (
+                  <div key={dateKey} className="space-y-4">
+                    <div className="flex items-center gap-4 px-2">
+                       <h4 className="text-sm font-black text-primary uppercase tracking-[0.2em]">
+                        {dateKey === todayKey ? 'TODAY' : new Date(dateKey).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })}
+                      </h4>
+                      <div className="h-px bg-slate-100 flex-1"></div>
+                      <span className="text-[10px] font-black text-slate-400">{dayBookings.length} Patients</span>
                     </div>
-                  );
-                })}
-              </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {dayBookings.map((appt: any) => (
+                        <div 
+                          key={appt._id}
+                          onClick={() => openBookingDetails(appt)}
+                          className="bg-white p-5 rounded-2xl border border-slate-100 hover:border-secondary hover:shadow-xl hover:shadow-secondary/5 transition-all cursor-pointer group relative overflow-hidden"
+                        >
+                          <div className="flex justify-between items-start mb-4">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-primary font-black text-xs uppercase group-hover:bg-primary group-hover:text-white transition-colors">
+                                {appt.name.substring(0, 2)}
+                              </div>
+                              <div>
+                                <h5 className="font-manrope font-black text-primary group-hover:text-secondary transition-colors truncate max-w-[120px]">{appt.name}</h5>
+                                <p className="text-[10px] font-bold text-slate-400 capitalize">{appt.time}</p>
+                              </div>
+                            </div>
+                            <span className={cn(
+                              "px-3 py-1 rounded-full text-[8px] font-black capitalize tracking-widest",
+                              appt.status === 'confirmed' ? 'bg-secondary/10 text-secondary' : 
+                              appt.status === 'completed' ? 'bg-green-100 text-green-600' : 'bg-slate-50 text-slate-400'
+                            )}>{appt.status}</span>
+                          </div>
+                          <div className="flex items-center justify-between mt-auto pt-2">
+                             <span className="text-[9px] font-bold text-slate-500 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100">{appt.service}</span>
+                             <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <Link onClick={(e) => e.stopPropagation()} href={`/admin/consultation/${appt._id}`} className="w-8 h-8 rounded-lg bg-secondary text-white flex items-center justify-center hover:scale-110 transition-transform">
+                                  <span className="material-symbols-outlined text-sm">medical_services</span>
+                                </Link>
+                             </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
-          </section>
+          )}
         </div>
 
         <div className="lg:col-span-4 h-full">

@@ -153,108 +153,134 @@ const publications = [
 
 const DiseaseCard = ({ disease }: { disease: { name: string, content: string, icon: any, color: string } }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const maxLength = 160;
+  const maxLength = 120;
   const shouldCollapse = disease.content.length > maxLength;
 
-  const colorVariants: Record<string, string> = {
-    blue: "text-blue-600 bg-blue-50 group-hover:bg-blue-600",
-    teal: "text-teal-600 bg-teal-50 group-hover:bg-teal-600",
-    red: "text-red-600 bg-red-50 group-hover:bg-red-600",
-    indigo: "text-indigo-600 bg-indigo-50 group-hover:bg-indigo-600",
-    amber: "text-amber-600 bg-amber-50 group-hover:bg-amber-600",
-    emerald: "text-emerald-600 bg-emerald-50 group-hover:bg-emerald-600",
-    rose: "text-rose-600 bg-rose-50 group-hover:bg-rose-600",
-    purple: "text-purple-600 bg-purple-50 group-hover:bg-purple-600",
-    cyan: "text-cyan-600 bg-cyan-50 group-hover:bg-cyan-600",
-    pink: "text-pink-600 bg-pink-50 group-hover:bg-pink-600",
-    slate: "text-slate-600 bg-slate-50 group-hover:bg-slate-600",
-    green: "text-green-600 bg-green-50 group-hover:bg-green-600",
-    sky: "text-sky-600 bg-sky-50 group-hover:bg-sky-600",
-    orange: "text-orange-600 bg-orange-50 group-hover:bg-orange-600",
+  const colorMap: Record<string, string> = {
+    blue: "from-blue-600 to-blue-400",
+    teal: "from-teal-600 to-teal-400",
+    red: "from-red-600 to-red-400",
+    indigo: "from-indigo-600 to-indigo-400",
+    amber: "from-amber-600 to-amber-400",
+    emerald: "from-emerald-600 to-emerald-400",
+    rose: "from-rose-600 to-rose-400",
+    purple: "from-purple-600 to-purple-400",
+    cyan: "from-cyan-600 to-cyan-400",
+    pink: "from-pink-600 to-pink-400",
+    slate: "from-slate-600 to-slate-400",
+    green: "from-green-600 to-green-400",
+    sky: "from-sky-600 to-sky-400",
+    orange: "from-orange-600 to-orange-400",
   };
 
   const Icon = disease.icon;
+  const gradient = colorMap[disease.color] || colorMap.blue;
 
   return (
-    <div className="group p-8 rounded-[1rem] bg-gradient-to-br from-white to-slate-50/50 border border-slate-100 hover:border-transparent hover:shadow-[0_20px_50px_rgba(30,58,138,0.1)] transition-all duration-500 hover:-translate-y-2 flex flex-col h-full relative overflow-hidden">
-      {/* Subtle hover gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-      
-      <div className="flex items-center gap-5 mb-8 relative z-10">
-        <div className={cn(
-          "w-14 h-14 rounded-xl flex items-center justify-center transition-all duration-500 transform group-hover:scale-110 group-hover:text-white group-hover:shadow-lg", 
-          colorVariants[disease.color] || colorVariants.blue
-        )}>
-          <Icon className="w-7 h-7" />
+    <motion.div
+      layout
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      whileHover={{ y: -8 }}
+      className="group relative bg-white rounded-[1rem] p-8 border border-slate-100/80 hover:shadow-[0_40px_80px_-20px_rgba(15,23,42,0.12)] transition-all duration-700 flex flex-col h-full overflow-hidden"
+    >
+      {/* Accent Column */}
+      <div className={cn("absolute left-0 top-12 bottom-12 w-1.5 rounded-r-full bg-gradient-to-b transition-all duration-700 group-hover:top-0 group-hover:bottom-0", gradient)}></div>
+
+      {/* Faint Background Icon Watermark */}
+      <Icon className="absolute -right-6 -bottom-6 w-48 h-48 text-slate-50 opacity-[0.03] group-hover:opacity-[0.08] group-hover:scale-110 transition-all duration-1000 -rotate-12 group-hover:rotate-0" />
+
+      <div className="relative z-10 space-y-6">
+        <div className="flex items-center justify-between">
+          <div className={cn("inline-flex items-center justify-center p-3 rounded-[1rem] bg-gradient-to-br shadow-lg shadow-black/5 group-hover:scale-110 transition-transform duration-700", gradient)}>
+            <Icon className="w-6 h-6 text-white" />
+          </div>
+          <span className="text-[10px] font-black text-slate-300 uppercase group-hover:text-primary/40 transition-colors">Expertise.01</span>
         </div>
-        <h3 className="text-xl font-bold font-manrope text-slate-900 group-hover:text-primary transition-colors leading-tight">{disease.name}</h3>
-      </div>
-      
-      <div className="flex-grow relative z-10">
-        <p className={cn(
-          "text-[13px] font-medium text-slate-500 leading-relaxed transition-all duration-300",
-          !isExpanded && shouldCollapse ? "line-clamp-4" : ""
-        )}>
-          {disease.content}
-        </p>
-      </div>
-      
-      {shouldCollapse && (
-        <div className="mt-6 relative z-10">
-          <button
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="flex items-center gap-2 text-[10px] font-black text-primary uppercase tracking-[0.2em] group/btn transition-all"
-          >
-            <span className="bg-primary/5 px-4 py-2 rounded-lg group-hover/btn:bg-primary group-hover/btn:text-white transition-colors flex items-center gap-2">
-              {isExpanded ? (
-                <>Less <ChevronUp className="w-3 h-3" /></>
-              ) : (
-                <>Read Overview <ChevronDown className="w-3 h-3 group-hover/btn:translate-y-0.5 transition-transform" /></>
-              )}
-            </span>
-          </button>
+
+        <div>
+          <h3 className="text-xl font-black font-manrope text-primary group-hover:text-primary transition-colors uppercase">
+            {disease.name}
+          </h3>
+          <div className={cn("w-10 h-1 bg-gradient-to-r rounded-full mt-2 transition-all duration-700 group-hover:w-20", gradient)}></div>
         </div>
-      )}
-    </div>
+
+        <div className="space-y-4">
+          <p className={cn(
+            "text-[13px] font-medium text-slate-500 leading-relaxed transition-all duration-500",
+            !isExpanded && shouldCollapse ? "line-clamp-4" : ""
+          )}>
+            {disease.content}
+          </p>
+
+          {shouldCollapse && (
+            <button
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="group/btn inline-flex items-center gap-2 text-[9px] font-black text-primary uppercase tracking-[0.3em] hover:gap-4 transition-all"
+            >
+              <span className="w-6 h-px bg-primary/20 group-hover/btn:bg-primary transition-colors"></span>
+              {isExpanded ? "Collapse" : "Read Brief"}
+            </button>
+          )}
+        </div>
+      </div>
+    </motion.div>
   );
 };
 
 export default function ExpertisePage() {
+  const [showAllDiseases, setShowAllDiseases] = useState(false);
+  const initialCount = 6; // 2 rows on desktop (3 cols)
+
+  const displayedDiseases = showAllDiseases ? diseasesData : diseasesData.slice(0, initialCount);
+
   return (
     <main className="bg-slate-50 text-slate-900 antialiased min-h-screen selection:bg-primary/10">
       <Navbar />
 
       {/* Hero Section */}
-      <section className="relative py-20 bg-gradient-to-br from-[#002B5B] via-[#00478D] to-[#0d9488] text-white overflow-hidden">
+      <section className="relative py-16 bg-gradient-to-br from-[#002B5B] via-[#00478D] to-[#0d9488] text-white overflow-hidden">
         <div className="absolute top-0 right-0 w-1/2 h-full bg-white/5 -skew-x-12 translate-x-1/3 pointer-events-none z-0"></div>
         <div className="absolute -top-32 -left-32 w-96 h-96 bg-secondary/20 rounded-full blur-[120px] pointer-events-none"></div>
 
         <div className="max-w-7xl mx-auto px-6 relative z-10">
-          <div className="flex flex-col lg:flex-row gap-20 items-center">
+          <div className="flex flex-col lg:flex-row gap-12 items-center text-center lg:text-left">
             <div className="lg:w-7/12 space-y-8">
-              <div className="inline-flex items-center gap-3 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/20">
-                <span className="w-2 h-2 rounded-full bg-teal-300 animate-pulse shadow-[0_0_8px_rgba(147,242,242,0.8)]"></span>
-                <span className="text-sm font-black text-teal-100 uppercase tracking-wider">Surgical Mastery</span>
+              <div className="inline-flex items-center gap-3 px-4 py-2 bg-white/10 backdrop-blur-xl rounded-full border border-white/20">
+                <span className="w-2 h-2 rounded-full bg-teal-300 animate-pulse"></span>
+                <span className="text-[10px] font-black text-teal-100 uppercase tracking-[0.3em]">Advanced Clinical Authority</span>
               </div>
-              <h1 className="text-4xl md:text-5xl font-black text-white uppercase leading-tight tracking-tight">
-                Fields of <br /> <span className="text-teal-300 italic">Excellence</span>
+              <h1 className="text-4xl md:text-6xl font-black text-white uppercase leading-[1]er">
+                Surgical <br /> <span className="text-teal-300 text-5xl md:text-7xl">Excellence.</span>
               </h1>
-              <p className="text-sm md:text-base text-blue-100 font-medium leading-relaxed max-w-xl font-inter opacity-80">
-                Merging advanced robotic technologies with 15+ years of clinical insight to deliver minimal-impact, maximum-result surgical care. Specialized in Laparoscopic, Bariatric, and Laser modalities.
+              <p className="text-sm md:text-base text-blue-100 font-medium leading-relaxed max-w-xl opacity-80">
+                Merging advanced robotic technologies with 15+ years of clinical insight. Specialized in Laparoscopic, Bariatric, and Laser modalities.
               </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                <Link href="/booking" className="px-10 py-4 bg-white text-primary rounded-[1rem] font-black text-xs uppercase tracking-widest shadow-2xl shadow-black/20 hover:scale-105 active:scale-95 transition-all">Book Consultation</Link>
+                <div className="flex -space-x-4 items-center justify-center">
+                  {[1, 2, 3, 4].map(i => (
+                    <div key={i} className="w-10 h-10 rounded-full border-2 border-primary bg-slate-200 overflow-hidden">
+                      <img src={`https://i.pravatar.cc/150?u=${i + 10}`} alt="Patient" />
+                    </div>
+                  ))}
+                  <div className="pl-4">
+                    <p className="text-[9px] font-black text-white">5k+ Patients</p>
+                    <p className="text-[8px] text-teal-300 font-bold">Successfully Treated</p>
+                  </div>
+                </div>
+              </div>
             </div>
             <div className="lg:w-5/12 grid grid-cols-2 gap-4">
-              <div className="aspect-[4/5] bg-white/10 rounded-[1rem] overflow-hidden translate-y-6 shadow-2xl relative group border border-white/20">
-                <img className="w-full h-full object-cover brightness-110 group-hover:scale-105 transition-all duration-700" src="/surgical-mastery.png" alt="Surgeon hands" />
-                <div className="absolute inset-x-0 bottom-0 p-6 bg-gradient-to-t from-black/60 to-transparent">
-                  <p className="text-white font-black text-sm uppercase">Precision</p>
-                </div>
+              <div className="aspect-[4/5] bg-white/10 rounded-[1rem] overflow-hidden translate-y-8 shadow-2xl relative group border border-white/10">
+                <img className="w-full h-full object-cover brightness-110 group-hover:scale-110 transition-all duration-1000" src="/surgical-mastery.png" alt="Surgeon hands" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#002B5B] via-transparent to-transparent opacity-60"></div>
               </div>
-              <div className="aspect-[4/5] bg-secondary-fixed/20 rounded-[1rem] overflow-hidden shadow-2xl relative group border border-white/20">
-                <img className="w-full h-full object-cover group-hover:scale-105 transition-all duration-700" src="/expertise-robotic.png" alt="Robotic Surgery" />
-                <div className="absolute inset-x-0 bottom-0 p-4 flex flex-col justify-end bg-gradient-to-t from-black/60 to-transparent">
-                  <span className="material-symbols-outlined text-white text-5xl mb-6">robot_2</span>
-                  <p className="text-white font-black text-xl uppercase leading-tight">Robotic Mastery</p>
+              <div className="aspect-[4/5] bg-white/10 rounded-[1rem] overflow-hidden shadow-2xl relative group border border-white/10">
+                <img className="w-full h-full object-cover group-hover:scale-110 transition-all duration-1000" src="/expertise-robotic.png" alt="Robotic Surgery" />
+                <div className="absolute inset-x-0 bottom-0 p-6 flex flex-col justify-end bg-gradient-to-t from-[#002B5B] to-transparent">
+                  <p className="text-white font-black text-xl uppercaseer">Robotic<br />Precision</p>
                 </div>
               </div>
             </div>
@@ -262,46 +288,63 @@ export default function ExpertisePage() {
         </div>
       </section>
 
-      {/* Expertise Grid */}
-      <section className="bg-white">
-        <div className="max-w-7xl mx-auto px-4 py-24">
+      {/* Core Specialties Grid */}
+      <section className="bg-white py-20 border-b border-slate-50">
+        <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {expertiseAreas.map((area, i) => (
-              <div key={i} className="group p-8 rounded-[1rem] bg-slate-50 border border-slate-100 hover:bg-white hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
-                <div className="w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all mb-8">
-                  <span className="material-symbols-outlined font-light">{i % 2 === 0 ? "stethoscope" : "healing"}</span>
+              <div key={i} className="group space-y-6 p-8 rounded-[1rem] bg-slate-50/50 hover:bg-white hover:shadow-2xl transition-all duration-700">
+                <div className="w-14 h-14 rounded-[1rem] bg-white shadow-xl shadow-slate-100 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white group-hover:scale-110 transition-all">
+                  <span className="material-symbols-outlined text-2xl font-light">{i % 2 === 0 ? "stethoscope" : "healing"}</span>
                 </div>
-                <h3 className="text-lg font-black text-primary captilize leading-tight mb-4">{area.title}</h3>
-                <p className="text-sm font-bold text-slate-400 captilize leading-relaxed">{area.desc}</p>
+                <div className="space-y-3">
+                  <h3 className="text-lg font-black text-primary uppercase">{area.title}</h3>
+                  <p className="text-xs font-bold text-slate-400 leading-relaxed uppercase opacity-80">{area.desc}</p>
+                </div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Our Expertise (Disease Section) */}
-      <section className="py-18 bg-gradient-to-b from-white via-slate-50/50 to-white relative overflow-hidden">
-        {/* Decorative background blur */}
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] -mr-64 -mt-64 opacity-50"></div>
-        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-secondary/5 rounded-full blur-[120px] -ml-64 -mb-64 opacity-50"></div>
+      {/* Expertise Catalog (Disease Section) */}
+      <section className="py-20 bg-slate-50 relative overflow-hidden">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full">
+          <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[150px] -mr-64 -mt-64"></div>
+          <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-secondary/5 rounded-full blur-[150px] -ml-64 -mb-64"></div>
+        </div>
 
         <div className="max-w-7xl mx-auto px-6 relative z-10">
-          <div className="text-center mb-24 space-y-6">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/5 rounded-full">
-              <ShieldCheck className="w-4 h-4 text-primary" />
-              <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Clinical Authority</span>
+          <div className="text-center mb-16 space-y-6">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white shadow-sm rounded-full border border-slate-100">
+              <ShieldCheck className="w-3 h-3 text-secondary" />
+              <span className="text-[9px] font-black text-primary uppercase tracking-[0.4em]">Clinical Knowledge Graph</span>
             </div>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 font-manrope tracking-tight">Our Expertise</h2>
-            <p className="text-slate-500 font-medium max-w-3xl mx-auto text-base md:text-lg leading-relaxed">
-              Merging deep clinical knowledge with advanced surgical protocols to provide definitive care for complex conditions.
+            <h2 className="text-3xl md:text-4xl font-black text-primary uppercase">Fields of <span className="text-secondary italic">Expertise.</span></h2>
+            <p className="text-slate-500 font-bold max-w-xl mx-auto text-xs md:text-sm leading-relaxed uppercase opacity-60">
+              Comprehensive diagnosis and surgical strategy for complex physiological conditions.
             </p>
-            <div className="w-24 h-1.5 bg-gradient-to-r from-primary to-secondary mx-auto rounded-full shadow-sm"></div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-            {diseasesData.map((disease, i) => (
-              <DiseaseCard key={i} disease={disease} />
-            ))}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <AnimatePresence mode="popLayout">
+              {displayedDiseases.map((disease, i) => (
+                <DiseaseCard key={disease.name} disease={disease} />
+              ))}
+            </AnimatePresence>
+          </div>
+
+          <div className="mt-16 text-center">
+            <button
+              onClick={() => setShowAllDiseases(!showAllDiseases)}
+              className="group relative px-10 py-4 bg-white rounded-[1rem] border border-slate-200 shadow-xl shadow-black/5 overflow-hidden transition-all hover:border-primary active:scale-95"
+            >
+              <div className="relative z-10 flex items-center gap-3 text-[9px] font-black text-primary uppercase tracking-[0.4em]">
+                {showAllDiseases ? "Show Less Discovery" : `Explore ${diseasesData.length - initialCount} More Conditions`}
+                <ChevronDown className={cn("w-3 h-3 text-secondary transition-transform duration-500", showAllDiseases && "rotate-180")} />
+              </div>
+              <div className="absolute inset-0 bg-slate-50 translate-y-full group-hover:translate-y-0 transition-transform duration-500"></div>
+            </button>
           </div>
         </div>
       </section>
@@ -313,7 +356,7 @@ export default function ExpertisePage() {
             <div className="lg:w-1/2 space-y-12">
               <div className="space-y-4">
                 <span className="text-secondary font-black uppercase text-sm">Academic Authority</span>
-                <h2 className="text-3xl md:text-5xl font-black text-primary uppercase leading-tight">Fellowship <br /> & Global Membership</h2>
+                <h2 className="text-3xl md:text-5xl font-black text-primary uppercase">Fellowship <br /> & Global Membership</h2>
                 <div className="w-20 h-1.5 bg-secondary rounded-full"></div>
               </div>
               <div className="space-y-8">
@@ -327,7 +370,7 @@ export default function ExpertisePage() {
                       <span className="material-symbols-outlined">{item.icon}</span>
                     </div>
                     <div>
-                      <h4 className="text-lg font-black text-primary uppercase tracking-tight">{item.title}</h4>
+                      <h4 className="text-lg font-black text-primary uppercase">{item.title}</h4>
                       <p className="text-sm font-bold text-slate-400 captilize mt-1">{item.role}</p>
                     </div>
                   </div>
@@ -339,13 +382,13 @@ export default function ExpertisePage() {
                 <span className="text-[11rem] font-black text-slate-100/30 absolute right-10 top-0 select-none -z-0">MS</span>
                 <div className="relative z-10 space-y-8">
                   <div className="space-y-3">
-                    <div className="inline-block px-3 py-1 bg-secondary/10 rounded-lg text-[10px] font-black text-secondary uppercase tracking-[0.2em] mb-2">Education Track</div>
-                    <h4 className="text-2xl md:text-3xl font-black text-primary uppercase leading-tight">MBBS & MS Surgery</h4>
+                    <div className="inline-block px-3 py-1 bg-secondary/10 rounded-lg text-[10px] font-black text-secondary uppercase mb-2">Education Track</div>
+                    <h4 className="text-2xl md:text-3xl font-black text-primary uppercase">MBBS & MS Surgery</h4>
                     <p className="text-sm font-bold text-slate-400 captilize leading-relaxed">Post Graduate Institute of Medical Sciences, Rohtak | Maharaja Agrasen Medical College</p>
                   </div>
                   <div className="space-y-3">
-                    <div className="inline-block px-3 py-1 bg-primary/10 rounded-lg text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-2">Specialized Training</div>
-                    <h4 className="text-2xl md:text-3xl font-black text-primary uppercase leading-tight">FNB Minimal Access</h4>
+                    <div className="inline-block px-3 py-1 bg-primary/10 rounded-lg text-[10px] font-black text-primary uppercase mb-2">Specialized Training</div>
+                    <h4 className="text-2xl md:text-3xl font-black text-primary uppercase">FNB Minimal Access</h4>
                     <p className="text-sm font-bold text-slate-400 captilize leading-relaxed">Fellowship from Max Super Speciality Hospital, Saket, New Delhi</p>
                   </div>
                 </div>

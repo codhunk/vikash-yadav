@@ -109,7 +109,7 @@ export default function Booking() {
         }),
       });
       const data = await res.json();
-        if (data.success) {
+      if (data.success) {
         setIsSuccess(true);
         setFormData({ name: "", phone: "", email: "", message: "" });
         // Refresh occupied slots
@@ -210,15 +210,19 @@ export default function Booking() {
                         selectedDate.getMonth() === viewDate.getMonth() &&
                         selectedDate.getFullYear() === viewDate.getFullYear();
 
+                      // Check if the date is in the past (before today)
+                      const isPast = d.currentMonth && dateObj < new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
                       return (
                         <button
                           key={i}
-                          disabled={!d.currentMonth}
-                          onClick={() => d.currentMonth && setSelectedDate(dateObj)}
+                          disabled={!d.currentMonth || isPast}
+                          onClick={() => d.currentMonth && !isPast && setSelectedDate(dateObj)}
                           className={cn(
                             "aspect-square relative flex items-center justify-center rounded-xl text-xs font-bold transition-all",
                             !d.currentMonth && "text-slate-200 cursor-not-allowed",
-                            d.currentMonth && !isSelected && "hover:bg-slate-50 text-primary",
+                            isPast && d.currentMonth && "text-primary/50 cursor-not-allowed",
+                            d.currentMonth && !isSelected && !isPast && "hover:bg-slate-50 text-primary",
                             isSelected && "bg-secondary text-white shadow-lg shadow-secondary/30 scale-110",
                             isToday && !isSelected && "border-2 border-secondary/20 bg-secondary/5"
                           )}
@@ -242,11 +246,11 @@ export default function Booking() {
                   <span className="w-10 h-10 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-manrope font-bold text-lg">3</span>
                   <h2 className="font-manrope text-2xl font-black text-primary capitalize tracking-tight">Available Slots</h2>
                 </div>
-                
+
                 {/* Error Message Display */}
                 <AnimatePresence>
                   {errorMessage && (
-                    <motion.div 
+                    <motion.div
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: "auto" }}
                       exit={{ opacity: 0, height: 0 }}
@@ -303,45 +307,45 @@ export default function Booking() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div className="space-y-2">
                     <label className="block text-sm font-black text-slate-600">Full Name</label>
-                    <input 
+                    <input
                       required
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full bg-slate-50 border-2 border-transparent focus:border-secondary focus:bg-white rounded-xl px-6 py-4 transition-all outline-none font-medium text-sm" 
-                      placeholder="John Doe" 
-                      type="text" 
+                      className="w-full bg-slate-50 border-2 border-transparent focus:border-secondary focus:bg-white rounded-xl px-6 py-4 transition-all outline-none font-medium text-sm"
+                      placeholder="John Doe"
+                      type="text"
                     />
                   </div>
                   <div className="space-y-2">
                     <label className="block text-sm font-black text-slate-600">Phone Number</label>
-                    <input 
+                    <input
                       required
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      className="w-full bg-slate-50 border-2 border-transparent focus:border-secondary focus:bg-white rounded-xl px-6 py-4 transition-all outline-none font-medium text-sm" 
-                      placeholder="+91 870 825 5349" 
-                      type="tel" 
+                      className="w-full bg-slate-50 border-2 border-transparent focus:border-secondary focus:bg-white rounded-xl px-6 py-4 transition-all outline-none font-medium text-sm"
+                      placeholder="+91 870 825 5349"
+                      type="tel"
                     />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <label className="block text-sm font-black text-slate-600">Email Address</label>
-                  <input 
+                  <input
                     required
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full bg-slate-50 border-2 border-transparent focus:border-secondary focus:bg-white rounded-xl px-6 py-4 transition-all outline-none font-medium text-sm" 
-                    placeholder="john.doe@email.com" 
-                    type="email" 
+                    className="w-full bg-slate-50 border-2 border-transparent focus:border-secondary focus:bg-white rounded-xl px-6 py-4 transition-all outline-none font-medium text-sm"
+                    placeholder="john.doe@email.com"
+                    type="email"
                   />
                 </div>
                 <div className="space-y-2">
                   <label className="block text-sm font-black text-slate-600">Reason for Visit</label>
-                  <textarea 
+                  <textarea
                     value={formData.message}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                    className="w-full bg-slate-50 border-2 border-transparent focus:border-secondary focus:bg-white rounded-xl px-6 py-4 transition-all outline-none font-medium text-sm min-h-[120px]" 
-                    placeholder="Briefly describe your symptoms or concern..." 
+                    className="w-full bg-slate-50 border-2 border-transparent focus:border-secondary focus:bg-white rounded-xl px-6 py-4 transition-all outline-none font-medium text-sm min-h-[120px]"
+                    placeholder="Briefly describe your symptoms or concern..."
                     rows={3}
                   ></textarea>
                 </div>
@@ -401,7 +405,7 @@ export default function Booking() {
                     Booking Confirmed! We will contact you soon.
                   </div>
                 ) : (
-                  <button 
+                  <button
                     form="booking-form"
                     disabled={isSubmitting}
                     type="submit"
