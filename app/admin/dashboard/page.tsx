@@ -83,7 +83,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-8 ">
-      {/* Header Inside Dashboard */}
+      {/* Header Inside Dashboard guerheiugh ijgniue ijrgnhiuer iureghsriu */}
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 ">
         <div>
           <h1 className="text-3xl font-extrabold text-primary font-manrope capitalize">Welcome, Dr. Yadav</h1>
