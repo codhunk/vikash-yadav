@@ -68,7 +68,7 @@ export default function ConsultationPage() {
   const fetchData = async () => {
     if (!id) return;
     try {
-      const idStr = Array.isArray(id) ? id[0] : id;
+      const idStr = Array.isArray(id) ? id[0] : (id as string);
       const isHistoryMode = idStr.startsWith("history-");
       const cleanId = isHistoryMode ? idStr.split("-")[1] : idStr;
       const endpoint = isHistoryMode ? `/api/patients/${cleanId}` : `/api/bookings/${cleanId}`;
@@ -153,12 +153,12 @@ export default function ConsultationPage() {
       <header className="bg-white p-4 rounded-[1rem] shadow-xl shadow-slate-200/50 border border-slate-100 no-print">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div className="flex items-center gap-6">
-            <div className="w-20 h-20 rounded-1xl bg-primary/10 flex items-center justify-center text-primary text-3xl font-black uppercase">
+            <div className="w-20 h-20 rounded-xl bg-primary/10 flex items-center justify-center text-primary text-3xl font-black uppercase">
               {booking.name.substring(0, 2)}
             </div>
             <div>
               <div className="flex items-center gap-3 mb-1">
-                <h1 className="text-2xl font-bold text-primary capitalize tracking-tight">{booking.name}</h1>
+                <h1 className="text-2xl font-bold text-primary capitalize">{booking.name}</h1>
                 <span className="px-3 py-1 bg-secondary/10 text-secondary rounded-full text-[10px] font-black uppercase tracking-widest">Active Consultation</span>
               </div>
               <div className="flex flex-wrap items-center gap-4 text-xs font-bold text-slate-400">
@@ -173,14 +173,14 @@ export default function ConsultationPage() {
           <div className="flex items-center gap-3 w-full md:w-auto">
             <button
               onClick={() => window.print()}
-              className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-4 bg-slate-50 text-slate-600 rounded-2xl font-black text-[10px] capitalize tracking-[0.2em] hover:bg-slate-100 transition-all"
+              className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-4 bg-slate-50 text-slate-600 rounded-xl font-black text-[10px] capitalize tracking-[0.2em] hover:bg-slate-100 transition-all"
             >
               <Printer className="w-4 h-4" /> Print Letter Head
             </button>
             <button
               onClick={handleSave}
               disabled={isSaving}
-              className="flex-1 md:flex-none flex items-center justify-center gap-2 px-8 py-4 bg-primary text-white rounded-2xl font-black text-[10px] capitalize tracking-[0.2em] shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50"
+              className="flex-1 md:flex-none flex items-center justify-center gap-2 px-8 py-4 bg-primary text-white rounded-xl font-black text-[10px] capitalize tracking-[0.2em] shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50"
             >
               <Save className="w-4 h-4" /> {isSaving ? "Saving..." : "Save Record"}
             </button>
@@ -189,7 +189,7 @@ export default function ConsultationPage() {
       </header>
 
       {/* Tabs */}
-      <div className="flex gap-2 p-1 bg-slate-100 w-fit rounded-2xl no-print">
+      <div className="flex gap-2 p-1 bg-slate-100 w-fit rounded-xl no-print">
         <button
           onClick={() => setActiveTab("current")}
           className={cn(
@@ -216,7 +216,7 @@ export default function ConsultationPage() {
             {/* Left Section: Inputs */}
             <div className="lg:col-span-8 space-y-8">
               {/* Vitals Form */}
-              <section className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-50">
+              <section className="bg-white p-8 rounded-xl shadow-sm border border-slate-50">
                 <div className="flex items-center gap-3 mb-8">
                   <Activity className="w-5 h-5 text-secondary" />
                   <h3 className="text-sm font-black text-primary uppercase tracking-[0.2em]">Patient Vitals</h3>
@@ -242,7 +242,7 @@ export default function ConsultationPage() {
               </section>
 
               {/* Symptoms & Diagnosis */}
-              <section className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-50 space-y-8">
+              <section className="bg-white p-8 rounded-[1rem] shadow-sm border border-slate-50 space-y-8">
                 <div className="space-y-4">
                   <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Symptoms & Chief Complaints</label>
                   <textarea
@@ -250,7 +250,7 @@ export default function ConsultationPage() {
                     onChange={e => setSymptoms(e.target.value)}
                     rows={3}
                     placeholder="Describe patient's symptoms..."
-                    className="w-full p-6 bg-slate-50 rounded-[1.5rem] text-sm font-bold border-2 border-transparent focus:border-primary/10 outline-none resize-none"
+                    className="w-full p-6 bg-slate-50 rounded-[1rem] text-sm font-bold border-2 border-transparent focus:border-primary/10 outline-none resize-none"
                   />
                 </div>
                 <div className="space-y-4">
@@ -260,13 +260,13 @@ export default function ConsultationPage() {
                     onChange={e => setDiagnosis(e.target.value)}
                     rows={2}
                     placeholder="Enter final or provisional diagnosis..."
-                    className="w-full p-6 bg-slate-50 rounded-[1.5rem] text-sm font-bold border-2 border-transparent focus:border-secondary/10 outline-none resize-none"
+                    className="w-full p-6 bg-slate-50 rounded-[1rem] text-sm font-bold border-2 border-transparent focus:border-secondary/10 outline-none resize-none"
                   />
                 </div>
               </section>
 
               {/* Medicines Grid */}
-              <section className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-50">
+              <section className="bg-white p-8 rounded-[1rem] shadow-sm border border-slate-50">
                 <div className="flex items-center justify-between mb-8">
                   <div className="flex items-center gap-3">
                     <Beaker className="w-5 h-5 text-primary" />
@@ -279,7 +279,7 @@ export default function ConsultationPage() {
 
                 <div className="space-y-4">
                   {medicines.map((med, index) => (
-                    <div key={index} className="grid grid-cols-12 gap-4 items-end bg-slate-50/50 p-4 rounded-2xl relative group">
+                    <div key={index} className="grid grid-cols-12 gap-4 items-end bg-slate-50/50 p-4 rounded-xl relative group">
                       <div className="col-span-12 md:col-span-5 space-y-2">
                         <label className="text-[8px] font-black text-slate-400 uppercase">Medicine Name</label>
                         <input value={med.name} onChange={e => updateMedicine(index, 'name', e.target.value)} placeholder="e.g. Paracetamol 650mg" className="w-full px-4 py-3 bg-white rounded-xl text-sm font-bold border border-slate-100 outline-none" />
@@ -314,14 +314,14 @@ export default function ConsultationPage() {
 
             {/* Right Section: Notes */}
             <div className="lg:col-span-4 space-y-8">
-              <section className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-50 h-full">
+              <section className="bg-white p-8 rounded-[1rem] shadow-sm border border-slate-50 h-full">
                 <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-4 block">Special Instructions</label>
                 <textarea
                   value={notes}
                   onChange={e => setNotes(e.target.value)}
                   rows={20}
                   placeholder="Additional advice for patient..."
-                  className="w-full p-6 bg-slate-50 rounded-[1.5rem] text-sm font-bold border-2 border-transparent focus:border-primary/10 outline-none resize-none h-[calc(100%-2rem)]"
+                  className="w-full p-6 bg-slate-50 rounded-[1rem] text-sm font-bold border-2 border-transparent focus:border-primary/10 outline-none resize-none h-[calc(100%-2rem)]"
                 />
               </section>
             </div>
@@ -330,13 +330,13 @@ export default function ConsultationPage() {
           /* History Section */
           <div className="lg:col-span-12 space-y-6">
             {history.length === 0 ? (
-              <div className="p-20 text-center bg-white rounded-[3rem] border border-dashed border-slate-200">
+              <div className="p-20 text-center bg-white rounded-[1rem] border border-dashed border-slate-200">
                 <History className="w-12 h-12 text-slate-200 mx-auto mb-4" />
                 <p className="text-slate-400 font-bold">No previous clinical history found for this patient.</p>
               </div>
             ) : (
               history.map((record, i) => (
-                <div key={record._id} className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-50 group hover:shadow-md transition-all">
+                <div key={record._id} className="bg-white p-8 rounded-[1rem] shadow-sm border border-slate-50 group hover:shadow-md transition-all">
                   <div className="flex justify-between items-start mb-6">
                     <div>
                       <p className="text-[10px] font-black text-secondary uppercase tracking-[0.2em]">{new Date(record.date).toLocaleDateString()} Visit</p>
@@ -384,7 +384,7 @@ export default function ConsultationPage() {
             </p>
           </div>
           <div className="text-right">
-            <div className="w-20 h-20 bg-primary/10 rounded-3xl flex items-center justify-center text-primary font-black ml-auto mb-4">logo</div>
+            <div className="w-20 h-20 bg-primary/10 rounded-xl flex items-center justify-center text-primary font-black ml-auto mb-4">logo</div>
             <p className="text-xs font-black uppercase tracking-widest">Clinical Prescription</p>
           </div>
         </div>
@@ -460,7 +460,7 @@ export default function ConsultationPage() {
 
         {/* Notes */}
         {notes && (
-          <div className="mt-12 p-6 bg-slate-50 rounded-2xl border border-slate-100">
+          <div className="mt-12 p-6 bg-slate-50 rounded-xl border border-slate-100">
             <h4 className="text-[10px] uppercase text-slate-400 font-bold mb-2">Special Instructions / Advice</h4>
             <p className="text-xs font-bold leading-relaxed">{notes}</p>
           </div>
